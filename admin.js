@@ -46,8 +46,12 @@ async function verificarSessao() {
 
 formLogin.addEventListener("submit", async (e) => {
   e.preventDefault();
-  const email = document.getElementById("adminEmail").value.trim();
+  const usuario = document.getElementById("adminEmail").value.trim().toLowerCase();
   const senha = document.getElementById("adminSenha").value;
+
+  // O Supabase Auth exige um e-mail por baixo dos panos, então
+  // transformamos o "usuário" digitado num e-mail interno fixo.
+  const email = usuario.includes("@") ? usuario : `${usuario}@mafiabarbearia.local`;
 
   loginMsg.textContent = "Entrando...";
   loginMsg.classList.remove("success");
