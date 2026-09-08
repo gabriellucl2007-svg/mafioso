@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="robots" content="noindex, nofollow">
+<title>Painel Admin — Máfia Barbearia</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Oswald:wght@500;600;700&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="style.css">
+</head>
+<body class="admin-body">
+
+<div class="admin-login" id="adminLogin">
+  <div class="admin-login-card">
+    <span class="logo-top">MÁFIA</span>
+    <h1 class="admin-title">Painel administrativo</h1>
+    <p class="admin-sub">Acesso restrito. Entre com seu e-mail e senha de administrador.</p>
+    <form id="formLogin">
+      <div class="form-group full">
+        <label for="adminEmail">E-mail</label>
+        <input type="email" id="adminEmail" required>
+      </div>
+      <div class="form-group full">
+        <label for="adminSenha">Senha</label>
+        <input type="password" id="adminSenha" required>
+      </div>
+      <button type="submit" class="btn-submit">Entrar</button>
+      <div class="form-msg" id="loginMsg"></div>
+    </form>
+  </div>
+</div>
+
+<div class="admin-painel" id="adminPainel" style="display:none;">
+  <header class="admin-header">
+    <span class="logo-top">MÁFIA <span class="admin-header-sub">/ Admin</span></span>
+    <div class="admin-header-actions">
+      <a href="index.html" class="btn-mini">Ver site</a>
+      <button id="btnLogout" class="btn btn-outline">Sair</button>
+    </div>
+  </header>
+
+  <main class="container admin-main">
+    <div class="admin-toolbar">
+      <h2>Agendamentos</h2>
+      <div class="admin-filtros">
+        <select id="filtroStatus">
+          <option value="todos">Todos os status</option>
+          <option value="pendente">Pendente</option>
+          <option value="confirmado">Confirmado</option>
+          <option value="concluido">Concluído</option>
+        </select>
+        <input type="date" id="filtroData">
+        <button id="btnAtualizar" class="btn btn-outline">Atualizar</button>
+      </div>
+    </div>
+
+    <div id="adminLista" class="admin-lista">
+      <p class="plano-vazio">Carregando agendamentos...</p>
+    </div>
+  </main>
+</div>
+
+<script type="module" src="admin.js"></script>
+</body>
+</html>
