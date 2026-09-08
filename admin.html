@@ -42,16 +42,39 @@
   </header>
 
   <main class="container admin-main">
+
+    <div class="admin-stats" id="adminStats">
+      <div class="stat-card">
+        <span class="stat-num" id="statHoje">–</span>
+        <span class="stat-label">Hoje</span>
+      </div>
+      <div class="stat-card">
+        <span class="stat-num" id="statPendentes">–</span>
+        <span class="stat-label">Pendentes</span>
+      </div>
+      <div class="stat-card">
+        <span class="stat-num" id="statConfirmados">–</span>
+        <span class="stat-label">Confirmados</span>
+      </div>
+      <div class="stat-card">
+        <span class="stat-num" id="statMes">–</span>
+        <span class="stat-label">Este mês</span>
+      </div>
+    </div>
+
     <div class="admin-toolbar">
       <h2>Agendamentos</h2>
       <div class="admin-filtros">
+        <input type="text" id="buscaTexto" placeholder="Buscar por nome, telefone ou e-mail">
         <select id="filtroStatus">
           <option value="todos">Todos os status</option>
           <option value="pendente">Pendente</option>
           <option value="confirmado">Confirmado</option>
           <option value="concluido">Concluído</option>
+          <option value="cancelado">Cancelado</option>
         </select>
         <input type="date" id="filtroData">
+        <button id="btnHoje" class="btn btn-outline">Hoje</button>
         <button id="btnAtualizar" class="btn btn-outline">Atualizar</button>
       </div>
     </div>
