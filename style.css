@@ -930,6 +930,119 @@ footer{
 }
 .admin-del-btn:hover{color:#e08a8a;border-color:#e08a8a;}
 
+/* ---------- Resumo (stats) ---------- */
+.admin-stats{
+  display:grid;
+  grid-template-columns:repeat(4,1fr);
+  gap:14px;
+  margin-bottom:34px;
+}
+.stat-card{
+  background:var(--bg-2);
+  border:1px solid var(--line-soft);
+  border-radius:var(--radius);
+  padding:20px 22px;
+  display:flex;
+  flex-direction:column;
+  gap:6px;
+}
+.stat-num{
+  font-family:'Bebas Neue',sans-serif;
+  font-size:34px;
+  color:var(--gray-100);
+  line-height:1;
+}
+.stat-label{
+  font-family:'Oswald',sans-serif;
+  font-size:11.5px;
+  letter-spacing:0.14em;
+  text-transform:uppercase;
+  color:var(--gray-600);
+}
+
+/* ---------- Busca ---------- */
+.admin-filtros input[type="text"]{min-width:220px;}
+
+/* ---------- Agrupamento por dia ---------- */
+.dia-grupo{margin-bottom:26px;}
+.dia-grupo-titulo{
+  font-family:'Oswald',sans-serif;
+  font-size:13px;
+  letter-spacing:0.1em;
+  text-transform:uppercase;
+  color:var(--gray-600);
+  border-bottom:1px solid var(--line-soft);
+  padding-bottom:8px;
+  margin-bottom:12px;
+}
+.dia-grupo-titulo span{color:var(--gray-100);}
+
+/* ---------- Item do agendamento (revisado) ---------- */
+.admin-item{
+  grid-template-columns:1.3fr 1fr auto;
+}
+.status-pill{
+  display:inline-block;
+  align-self:flex-start;
+  margin-top:4px;
+  padding:3px 10px;
+  border-radius:20px;
+  font-family:'Oswald',sans-serif;
+  font-size:11px;
+  letter-spacing:0.06em;
+  text-transform:uppercase;
+  border:1px solid var(--line-soft);
+}
+.status-pill--pendente{color:#d8c07a;border-color:rgba(216,192,122,0.4);}
+.status-pill--confirmado{color:#a8c99a;border-color:rgba(168,201,154,0.4);}
+.status-pill--concluido{color:var(--gray-500);border-color:var(--line-soft);}
+.status-pill--cancelado{color:#e08a8a;border-color:rgba(224,138,138,0.4);}
+
+.admin-item-contato a.whats-link{
+  color:#a8c99a;
+  font-size:12.5px;
+  display:inline-flex;
+  align-items:center;
+  gap:5px;
+}
+.admin-item-contato a.whats-link:hover{text-decoration:underline;}
+
+.admin-actions-row{display:flex;gap:8px;flex-wrap:wrap;align-items:center;}
+.action-btn{
+  border:1px solid var(--line-soft);
+  border-radius:var(--radius);
+  padding:7px 12px;
+  font-family:'Oswald',sans-serif;
+  font-size:11.5px;
+  letter-spacing:0.04em;
+  text-transform:uppercase;
+  color:var(--gray-500);
+  transition:all .2s;
+  white-space:nowrap;
+}
+.action-btn:hover{border-color:var(--gray-500);color:var(--gray-100);}
+.action-btn--confirmar:hover{color:#a8c99a;border-color:rgba(168,201,154,0.5);}
+.action-btn--concluir:hover{color:var(--gray-100);border-color:var(--gray-100);}
+.action-btn--cancelar:hover{color:#e08a8a;border-color:rgba(224,138,138,0.5);}
+.action-btn--ativo{
+  background:var(--gray-100);
+  color:var(--bg-0);
+  border-color:var(--gray-100);
+}
+
+.plano-vazio{
+  text-align:center;
+  color:var(--gray-600);
+  padding:60px 20px;
+  border:1px dashed var(--line-soft);
+  border-radius:var(--radius);
+  font-size:14px;
+}
+
+@media (max-width:900px){
+  .admin-stats{grid-template-columns:repeat(2,1fr);}
+}
+
 @media (max-width:768px){
   .admin-item{grid-template-columns:1fr;}
   .admin-header{padding:16px 20px;}
