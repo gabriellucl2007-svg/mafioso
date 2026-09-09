@@ -827,11 +827,11 @@ footer{
 /* ===================================================================
    TURNO
 =================================================================== */
-.turno-select{display:flex;gap:10px;flex-wrap:wrap;}
+.turno-select{display:flex;gap:8px;flex-wrap:wrap;max-height:220px;overflow-y:auto;padding-right:4px;}
 .turno-btn{
-  flex:1;
-  min-width:110px;
-  padding:14px 10px;
+  flex:0 1 84px;
+  min-width:84px;
+  padding:11px 8px;
   border:1px solid var(--line);
   border-radius:var(--radius);
   color:var(--gray-300);
@@ -840,6 +840,11 @@ footer{
   letter-spacing:.03em;
   transition:all .2s;
   background:var(--bg-1);
+}
+.horario-aviso{
+  color:var(--gray-600);
+  font-size:13px;
+  font-family:'Oswald',sans-serif;
 }
 .turno-btn:hover{border-color:var(--gray-500);}
 .turno-btn--ativo{
