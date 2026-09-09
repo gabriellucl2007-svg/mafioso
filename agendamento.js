@@ -77,12 +77,40 @@ function renderCalendario() {
         dataSelecionada = iso;
         calGrid.querySelectorAll(".cal-dia").forEach(el => el.classList.remove("cal-dia--selecionado"));
         btn.classList.add("cal-dia--selecionado");
+        atualizarDisponibilidadeTurnos(iso);
       });
     }
 
     if (iso === dataSelecionada) btn.classList.add("cal-dia--selecionado");
 
     calGrid.appendChild(btn);
+  }
+}
+
+const LIMITE_POR_TURNO = 4;
+const LABEL_TURNO = { manha: "☀️ Manhã", tarde: "🌅 Tarde", noite: "🌙 Noite" };
+
+async function atualizarDisponibilidadeTurnos(iso) {
+  if (!turnoSelect) return;
+  const botoes = turnoSelect.querySelectorAll(".turno-btn");
+
+  for (const btn of botoes) {
+    const turno = btn.dataset.turno;
+    const { data: ocupados, error } = await supabase.rpc("contar_agendamentos_turno", {
+      p_data: iso,
+      p_turno: turno
+    });
+
+    const lotado = !error && ocupados >= LIMITE_POR_TURNO;
+
+    btn.disabled = lotado;
+    btn.classList.toggle("turno-btn--lotado", lotado);
+    btn.textContent = lotado ? `${LABEL_TURNO[turno]} · Lotado` : LABEL_TURNO[turno];
+
+    if (lotado && turnoSelecionado === turno) {
+      turnoSelecionado = null;
+      btn.classList.remove("turno-btn--ativo");
+    }
   }
 }
 
@@ -147,7 +175,12 @@ if (form) {
 
     if (error) {
       console.error(error);
-      mostrarMsg("Não deu pra enviar agora. Tenta de novo em instantes.", false);
+      if (error.message && error.message.includes("cheio")) {
+        mostrarMsg("Esse turno acabou de lotar. Escolha outro horário.", false);
+        atualizarDisponibilidadeTurnos(dataSelecionada);
+      } else {
+        mostrarMsg("Não deu pra enviar agora. Tenta de novo em instantes.", false);
+      }
     } else {
       const linkAviso = linkAvisoBarbeiro({ nome, telefone, servico, data: dataSelecionada, turno: turnoSelecionado });
       formMsg.innerHTML = `
