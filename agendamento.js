@@ -170,10 +170,7 @@ async function buscarPorEmail() {
   planoResultados.innerHTML = `<p class="plano-vazio">Buscando...</p>`;
 
   const { data, error } = await supabase
-    .from("agendamentos")
-    .select("*")
-    .eq("email", email)
-    .order("data", { ascending: true });
+    .rpc("buscar_agendamentos_por_email", { p_email: email });
 
   if (error) {
     console.error(error);
