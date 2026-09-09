@@ -10,6 +10,18 @@ const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
 const NOMES_MESES = ["Janeiro","Fevereiro","Março","Abril","Maio","Junho","Julho","Agosto","Setembro","Outubro","Novembro","Dezembro"];
 const NOMES_TURNO = { manha: "Manhã", tarde: "Tarde", noite: "Noite" };
+const NUMERO_BARBEIRO = "5537998619864";
+
+function linkAvisoBarbeiro({ nome, telefone, servico, data, turno }) {
+  const texto =
+    `Novo agendamento na Máfia Barbearia!\n\n` +
+    `Nome: ${nome}\n` +
+    `Telefone: ${telefone}\n` +
+    `Serviço: ${servico}\n` +
+    `Data: ${formatarDataBR(data)}\n` +
+    `Turno: ${NOMES_TURNO[turno] || turno}`;
+  return `https://wa.me/${NUMERO_BARBEIRO}?text=${encodeURIComponent(texto)}`;
+}
 
 let dataAtual = new Date();
 let mesExibido = dataAtual.getMonth();
@@ -137,7 +149,12 @@ if (form) {
       console.error(error);
       mostrarMsg("Não deu pra enviar agora. Tenta de novo em instantes.", false);
     } else {
-      mostrarMsg("Agendamento confirmado! Te esperamos por aqui. 💈", true);
+      const linkAviso = linkAvisoBarbeiro({ nome, telefone, servico, data: dataSelecionada, turno: turnoSelecionado });
+      formMsg.innerHTML = `
+        <p>Agendamento confirmado! Te esperamos por aqui. 💈</p>
+        <a href="${linkAviso}" target="_blank" rel="noopener" class="btn-whats aviso-whats-btn">Avisar Rian no WhatsApp</a>
+      `;
+      formMsg.classList.add("success");
       form.reset();
       dataSelecionada = null;
       turnoSelecionado = null;
