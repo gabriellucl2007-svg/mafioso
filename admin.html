@@ -44,47 +44,159 @@
 
   <main class="container admin-main">
 
-    <div class="admin-stats" id="adminStats">
-      <div class="stat-card">
-        <span class="stat-num" id="statHoje">–</span>
-        <span class="stat-label">Hoje</span>
-      </div>
-      <div class="stat-card">
-        <span class="stat-num" id="statPendentes">–</span>
-        <span class="stat-label">Pendentes</span>
-      </div>
-      <div class="stat-card">
-        <span class="stat-num" id="statConfirmados">–</span>
-        <span class="stat-label">Confirmados</span>
-      </div>
-      <div class="stat-card">
-        <span class="stat-num" id="statMes">–</span>
-        <span class="stat-label">Este mês</span>
-      </div>
-    </div>
+    <nav class="admin-tabs" id="adminTabs">
+      <button class="admin-tab admin-tab--ativo" data-tab="agendamentos">Agendamentos</button>
+      <button class="admin-tab" data-tab="servicos">Serviços</button>
+      <button class="admin-tab" data-tab="equipe">Equipe</button>
+      <button class="admin-tab" data-tab="config">Configurações</button>
+    </nav>
 
-    <div class="admin-toolbar">
-      <h2>Agendamentos</h2>
-      <div class="admin-filtros">
-        <input type="text" id="buscaTexto" placeholder="Buscar por nome, telefone ou e-mail">
-        <select id="filtroStatus">
-          <option value="todos">Todos os status</option>
-          <option value="pendente">Pendente</option>
-          <option value="confirmado">Confirmado</option>
-          <option value="concluido">Concluído</option>
-          <option value="cancelado">Cancelado</option>
-        </select>
-        <input type="date" id="filtroData">
-        <button id="btnHoje" class="btn btn-outline">Hoje</button>
-        <button id="btnAtualizar" class="btn btn-outline">Atualizar</button>
-      </div>
-    </div>
+    <!-- ===================== ABA: AGENDAMENTOS ===================== -->
+    <section class="admin-tab-painel admin-tab-painel--ativo" data-tab-painel="agendamentos">
 
-    <div id="adminLista" class="admin-lista">
-      <p class="plano-vazio">Carregando agendamentos...</p>
-    </div>
+      <div class="admin-stats" id="adminStats">
+        <div class="stat-card">
+          <span class="stat-num" id="statHoje">–</span>
+          <span class="stat-label">Hoje</span>
+        </div>
+        <div class="stat-card">
+          <span class="stat-num" id="statPendentes">–</span>
+          <span class="stat-label">Pendentes</span>
+        </div>
+        <div class="stat-card">
+          <span class="stat-num" id="statConfirmados">–</span>
+          <span class="stat-label">Confirmados</span>
+        </div>
+        <div class="stat-card">
+          <span class="stat-num" id="statMes">–</span>
+          <span class="stat-label">Este mês</span>
+        </div>
+      </div>
+
+      <div class="admin-toolbar">
+        <h2>Agendamentos</h2>
+        <div class="admin-filtros">
+          <input type="text" id="buscaTexto" placeholder="Buscar por nome, telefone ou e-mail">
+          <select id="filtroBarbeiro">
+            <option value="todos">Todos os barbeiros</option>
+          </select>
+          <select id="filtroStatus">
+            <option value="todos">Todos os status</option>
+            <option value="pendente">Pendente</option>
+            <option value="confirmado">Confirmado</option>
+            <option value="concluido">Concluído</option>
+            <option value="cancelado">Cancelado</option>
+          </select>
+          <input type="date" id="filtroData">
+          <button id="btnHoje" class="btn btn-outline">Hoje</button>
+          <button id="btnAtualizar" class="btn btn-outline">Atualizar</button>
+        </div>
+      </div>
+
+      <div id="adminLista" class="admin-lista">
+        <p class="plano-vazio">Carregando agendamentos...</p>
+      </div>
+    </section>
+
+    <!-- ===================== ABA: SERVIÇOS ===================== -->
+    <section class="admin-tab-painel" data-tab-painel="servicos">
+      <div class="admin-toolbar">
+        <h2>Serviços</h2>
+        <button id="btnNovoServico" class="btn btn-outline">+ Novo serviço</button>
+      </div>
+      <p class="admin-dica">Preço, duração e status ficam ativos assim que você salva — o site público atualiza sozinho.</p>
+      <div id="listaServicos" class="admin-crud-lista">
+        <p class="plano-vazio">Carregando serviços...</p>
+      </div>
+    </section>
+
+    <!-- ===================== ABA: EQUIPE ===================== -->
+    <section class="admin-tab-painel" data-tab-painel="equipe">
+      <div class="admin-toolbar">
+        <h2>Equipe</h2>
+        <button id="btnNovoBarbeiro" class="btn btn-outline">+ Novo barbeiro</button>
+      </div>
+      <p class="admin-dica">Cada barbeiro tem horário de trabalho e folgas próprios — configure abrindo o cartão dele.</p>
+      <div id="listaBarbeiros" class="admin-crud-lista">
+        <p class="plano-vazio">Carregando equipe...</p>
+      </div>
+    </section>
+
+    <!-- ===================== ABA: CONFIGURAÇÕES ===================== -->
+    <section class="admin-tab-painel" data-tab-painel="config">
+      <div class="admin-toolbar">
+        <h2>Configurações da barbearia</h2>
+      </div>
+      <form id="formConfig" class="admin-config-form">
+        <div class="form-grid">
+          <div class="form-group">
+            <label for="cfgNome">Nome da barbearia</label>
+            <input type="text" id="cfgNome">
+          </div>
+          <div class="form-group">
+            <label for="cfgTagline">Frase de efeito (aparece no topo do site)</label>
+            <input type="text" id="cfgTagline">
+          </div>
+          <div class="form-group">
+            <label for="cfgEndereco">Endereço</label>
+            <input type="text" id="cfgEndereco">
+          </div>
+          <div class="form-group">
+            <label for="cfgTelefone">Telefone (exibido no site)</label>
+            <input type="text" id="cfgTelefone" placeholder="(37) 99999-9999">
+          </div>
+          <div class="form-group">
+            <label for="cfgWhatsapp">WhatsApp (só números, com DDD e país)</label>
+            <input type="text" id="cfgWhatsapp" placeholder="5537999999999">
+          </div>
+          <div class="form-group">
+            <label for="cfgInstagram">Instagram</label>
+            <input type="text" id="cfgInstagram" placeholder="@mafiabarbearia">
+          </div>
+          <div class="form-group">
+            <label for="cfgEmail">E-mail de contato</label>
+            <input type="email" id="cfgEmail">
+          </div>
+          <div class="form-group">
+            <label for="cfgIntervalo">Duração padrão de cada horário (minutos)</label>
+            <input type="number" id="cfgIntervalo" min="10" step="5">
+          </div>
+        </div>
+
+        <h3 class="admin-subtitulo">Horário geral (exibido no site)</h3>
+        <div class="form-grid">
+          <div class="form-group">
+            <label for="cfgSegSexAbre">Segunda a sexta — abre</label>
+            <input type="time" id="cfgSegSexAbre">
+          </div>
+          <div class="form-group">
+            <label for="cfgSegSexFecha">Segunda a sexta — fecha</label>
+            <input type="time" id="cfgSegSexFecha">
+          </div>
+          <div class="form-group">
+            <label for="cfgSabadoAbre">Sábado — abre</label>
+            <input type="time" id="cfgSabadoAbre">
+          </div>
+          <div class="form-group">
+            <label for="cfgSabadoFecha">Sábado — fecha</label>
+            <input type="time" id="cfgSabadoFecha">
+          </div>
+          <div class="form-group form-group--check">
+            <label><input type="checkbox" id="cfgDomingo"> Funciona aos domingos</label>
+          </div>
+        </div>
+
+        <button type="submit" class="btn-submit" style="max-width:220px;">Salvar configurações</button>
+        <p class="admin-msg" id="configMsg"></p>
+      </form>
+    </section>
+
   </main>
 </div>
+
+<script type="module" src="admin.js"></script>
+</body>
+</html>
 
 <script type="module" src="admin.js"></script>
 </body>
