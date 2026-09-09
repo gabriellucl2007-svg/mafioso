@@ -848,6 +848,12 @@ footer{
   border-color:var(--gray-100);
   font-weight:600;
 }
+.turno-btn--lotado{
+  opacity:0.4;
+  cursor:not-allowed;
+  text-decoration:line-through;
+}
+.turno-btn--lotado:hover{border-color:var(--line);}
 
 /* ===================================================================
    PÁGINA ADMIN
