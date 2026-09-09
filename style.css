@@ -505,6 +505,7 @@ header{
   min-height:18px;
 }
 .form-msg.success{color:#a8c99a;}
+.aviso-whats-btn{margin-top:14px;display:inline-flex;}
 
 .agendamento-side h3{font-size:22px;margin-bottom:26px;}
 .side-item{display:flex;gap:16px;margin-bottom:26px;}
