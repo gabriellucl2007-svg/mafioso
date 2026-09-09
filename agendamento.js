@@ -1,5 +1,5 @@
 // ===================================================================
-// AGENDAMENTO.JS — calendário, turno, "você tem plano?" e gravação
+// AGENDAMENTO.JS — calendário, horário exato, "já agendei?" e gravação
 // dos agendamentos no Supabase.
 // ===================================================================
 
@@ -12,14 +12,19 @@ const NOMES_MESES = ["Janeiro","Fevereiro","Março","Abril","Maio","Junho","Julh
 const NOMES_TURNO = { manha: "Manhã", tarde: "Tarde", noite: "Noite" };
 const NUMERO_BARBEIRO = "5537998619864";
 
-function linkAvisoBarbeiro({ nome, telefone, servico, data, turno }) {
+// Horário de funcionamento (bate com a seção "Horários" do site)
+const INTERVALO_MINUTOS = 40; // duração média de cada atendimento
+const HORARIO_SEMANA = { abre: "08:00", fecha: "20:00" }; // seg a sex
+const HORARIO_SABADO = { abre: "08:00", fecha: "18:00" };
+
+function linkAvisoBarbeiro({ nome, telefone, servico, data, hora }) {
   const texto =
     `Novo agendamento na Máfia Barbearia!\n\n` +
     `Nome: ${nome}\n` +
     `Telefone: ${telefone}\n` +
     `Serviço: ${servico}\n` +
     `Data: ${formatarDataBR(data)}\n` +
-    `Turno: ${NOMES_TURNO[turno] || turno}`;
+    `Horário: ${hora}`;
   return `https://wa.me/${NUMERO_BARBEIRO}?text=${encodeURIComponent(texto)}`;
 }
 
@@ -27,17 +32,54 @@ let dataAtual = new Date();
 let mesExibido = dataAtual.getMonth();
 let anoExibido = dataAtual.getFullYear();
 let dataSelecionada = null; // "YYYY-MM-DD"
-let turnoSelecionado = null;
+let horaSelecionada = null; // "HH:MM"
 
 const calGrid = document.getElementById("calGrid");
 const calMonthLabel = document.getElementById("calMonthLabel");
 const calPrev = document.getElementById("calPrev");
 const calNext = document.getElementById("calNext");
-const turnoSelect = document.getElementById("turnoSelect");
+const turnoSelect = document.getElementById("turnoSelect"); // agora é a grade de horários
 const form = document.getElementById("formAgendamento");
 const formMsg = document.getElementById("formMsg");
 
 function pad(n) { return String(n).padStart(2, "0"); }
+
+function minutosParaHora(min) {
+  return `${pad(Math.floor(min / 60))}:${pad(min % 60)}`;
+}
+
+function horaParaMinutos(hhmm) {
+  const [h, m] = hhmm.split(":").map(Number);
+  return h * 60 + m;
+}
+
+// Gera a lista de horários possíveis pra uma data, já removendo
+// horários no passado se a data escolhida for hoje.
+function gerarHorariosDoDia(iso) {
+  const [ano, mes, dia] = iso.split("-").map(Number);
+  const dataObj = new Date(ano, mes - 1, dia);
+  const diaSemana = dataObj.getDay(); // 0 = domingo, 6 = sábado
+
+  if (diaSemana === 0) return []; // fechado aos domingos
+
+  const janela = diaSemana === 6 ? HORARIO_SABADO : HORARIO_SEMANA;
+  const inicio = horaParaMinutos(janela.abre);
+  const fim = horaParaMinutos(janela.fecha);
+
+  const horarios = [];
+  for (let m = inicio; m + INTERVALO_MINUTOS <= fim; m += INTERVALO_MINUTOS) {
+    horarios.push(minutosParaHora(m));
+  }
+
+  const hoje = new Date();
+  const ehHoje = dataObj.toDateString() === hoje.toDateString();
+  if (ehHoje) {
+    const agoraEmMinutos = hoje.getHours() * 60 + hoje.getMinutes();
+    return horarios.filter(h => horaParaMinutos(h) > agoraEmMinutos);
+  }
+
+  return horarios;
+}
 
 function renderCalendario() {
   if (!calGrid) return;
@@ -75,9 +117,10 @@ function renderCalendario() {
     } else {
       btn.addEventListener("click", () => {
         dataSelecionada = iso;
+        horaSelecionada = null;
         calGrid.querySelectorAll(".cal-dia").forEach(el => el.classList.remove("cal-dia--selecionado"));
         btn.classList.add("cal-dia--selecionado");
-        atualizarDisponibilidadeTurnos(iso);
+        atualizarHorariosDisponiveis(iso);
       });
     }
 
@@ -87,31 +130,40 @@ function renderCalendario() {
   }
 }
 
-const LIMITE_POR_TURNO = 4;
-const LABEL_TURNO = { manha: "☀️ Manhã", tarde: "🌅 Tarde", noite: "🌙 Noite" };
-
-async function atualizarDisponibilidadeTurnos(iso) {
+// Consulta os horários já ocupados naquele dia e desenha os botões
+async function atualizarHorariosDisponiveis(iso) {
   if (!turnoSelect) return;
-  const botoes = turnoSelect.querySelectorAll(".turno-btn");
 
-  for (const btn of botoes) {
-    const turno = btn.dataset.turno;
-    const { data: ocupados, error } = await supabase.rpc("contar_agendamentos_turno", {
-      p_data: iso,
-      p_turno: turno
+  turnoSelect.innerHTML = `<span class="horario-aviso">Carregando horários...</span>`;
+
+  const todosHorarios = gerarHorariosDoDia(iso);
+
+  if (!todosHorarios.length) {
+    turnoSelect.innerHTML = `<span class="horario-aviso">Fechado nesse dia. Escolha outra data.</span>`;
+    return;
+  }
+
+  const { data: ocupados, error } = await supabase.rpc("horarios_ocupados", { p_data: iso });
+  const horariosOcupados = error ? [] : (ocupados || []).map(o => o.hora.slice(0, 5));
+
+  turnoSelect.innerHTML = "";
+  todosHorarios.forEach(hora => {
+    const lotado = horariosOcupados.includes(hora);
+    const btn = document.createElement("button");
+    btn.type = "button";
+    btn.className = "turno-btn";
+    btn.textContent = lotado ? `${hora} · Ocupado` : hora;
+    btn.disabled = lotado;
+    if (lotado) btn.classList.add("turno-btn--lotado");
+
+    btn.addEventListener("click", () => {
+      turnoSelect.querySelectorAll(".turno-btn").forEach(b => b.classList.remove("turno-btn--ativo"));
+      btn.classList.add("turno-btn--ativo");
+      horaSelecionada = hora;
     });
 
-    const lotado = !error && ocupados >= LIMITE_POR_TURNO;
-
-    btn.disabled = lotado;
-    btn.classList.toggle("turno-btn--lotado", lotado);
-    btn.textContent = lotado ? `${LABEL_TURNO[turno]} · Lotado` : LABEL_TURNO[turno];
-
-    if (lotado && turnoSelecionado === turno) {
-      turnoSelecionado = null;
-      btn.classList.remove("turno-btn--ativo");
-    }
-  }
+    turnoSelect.appendChild(btn);
+  });
 }
 
 if (calPrev && calNext) {
@@ -126,16 +178,6 @@ if (calPrev && calNext) {
     renderCalendario();
   });
   renderCalendario();
-}
-
-if (turnoSelect) {
-  turnoSelect.querySelectorAll(".turno-btn").forEach(btn => {
-    btn.addEventListener("click", () => {
-      turnoSelect.querySelectorAll(".turno-btn").forEach(b => b.classList.remove("turno-btn--ativo"));
-      btn.classList.add("turno-btn--ativo");
-      turnoSelecionado = btn.dataset.turno;
-    });
-  });
 }
 
 /* ---------- ENVIAR AGENDAMENTO ---------- */
@@ -156,8 +198,8 @@ if (form) {
       mostrarMsg("Escolha uma data no calendário.", false);
       return;
     }
-    if (!turnoSelecionado) {
-      mostrarMsg("Escolha um turno (manhã, tarde ou noite).", false);
+    if (!horaSelecionada) {
+      mostrarMsg("Escolha um horário disponível.", false);
       return;
     }
 
@@ -169,30 +211,33 @@ if (form) {
       nome, telefone, email, servico,
       barbeiro: "Rian",
       data: dataSelecionada,
-      turno: turnoSelecionado,
+      hora: `${horaSelecionada}:00`,
       status: "pendente"
     }]);
 
     if (error) {
       console.error(error);
-      if (error.message && error.message.includes("cheio")) {
-        mostrarMsg("Esse turno acabou de lotar. Escolha outro horário.", false);
-        atualizarDisponibilidadeTurnos(dataSelecionada);
+      if (error.code === "23505") {
+        mostrarMsg("Esse horário acabou de ser reservado por outra pessoa. Escolha outro.", false);
+        atualizarHorariosDisponiveis(dataSelecionada);
       } else {
         mostrarMsg("Não deu pra enviar agora. Tenta de novo em instantes.", false);
       }
     } else {
-      const linkAviso = linkAvisoBarbeiro({ nome, telefone, servico, data: dataSelecionada, turno: turnoSelecionado });
+      const linkAviso = linkAvisoBarbeiro({ nome, telefone, servico, data: dataSelecionada, hora: horaSelecionada });
       formMsg.innerHTML = `
         <p>Agendamento confirmado! Te esperamos por aqui. 💈</p>
         <a href="${linkAviso}" target="_blank" rel="noopener" class="btn-whats aviso-whats-btn">Avisar Rian no WhatsApp</a>
       `;
       formMsg.classList.add("success");
       form.reset();
+      const dataConfirmada = dataSelecionada;
       dataSelecionada = null;
-      turnoSelecionado = null;
+      horaSelecionada = null;
       renderCalendario();
-      if (turnoSelect) turnoSelect.querySelectorAll(".turno-btn").forEach(b => b.classList.remove("turno-btn--ativo"));
+      if (turnoSelect) {
+        turnoSelect.innerHTML = `<span class="horario-aviso">Escolha uma data no calendário para ver os horários disponíveis.</span>`;
+      }
     }
 
     btn.disabled = false;
@@ -205,7 +250,7 @@ function mostrarMsg(texto, sucesso) {
   formMsg.classList.toggle("success", !!sucesso);
 }
 
-/* ---------- VOCÊ TEM PLANO? (BUSCA POR E-MAIL) ---------- */
+/* ---------- VOCÊ JÁ AGENDOU? (BUSCA POR E-MAIL) ---------- */
 const planoBuscar = document.getElementById("planoBuscar");
 const planoEmail = document.getElementById("planoEmail");
 const planoResultados = document.getElementById("planoResultados");
@@ -237,7 +282,7 @@ async function buscarPorEmail() {
     <div class="plano-item">
       <div class="plano-item-data">
         <strong>${formatarDataBR(item.data)}</strong>
-        <span>${NOMES_TURNO[item.turno] || item.turno}</span>
+        <span>${item.hora ? item.hora.slice(0, 5) : (NOMES_TURNO[item.turno] || item.turno)}</span>
       </div>
       <div class="plano-item-info">
         <span>${item.servico}</span>
