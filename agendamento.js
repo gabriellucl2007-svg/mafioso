@@ -1,6 +1,6 @@
 // ===================================================================
-// AGENDAMENTO.JS — calendário, horário exato, "já agendei?" e gravação
-// dos agendamentos no Supabase.
+// AGENDAMENTO.JS — calendário, horário exato (por barbeiro), "já
+// agendei?" e gravação dos agendamentos no Supabase.
 // ===================================================================
 
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
@@ -9,24 +9,6 @@ import { SUPABASE_URL, SUPABASE_ANON_KEY } from "./supabase-config.js";
 const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
 const NOMES_MESES = ["Janeiro","Fevereiro","Março","Abril","Maio","Junho","Julho","Agosto","Setembro","Outubro","Novembro","Dezembro"];
-const NOMES_TURNO = { manha: "Manhã", tarde: "Tarde", noite: "Noite" };
-const NUMERO_BARBEIRO = "5537998619864";
-
-// Horário de funcionamento (bate com a seção "Horários" do site)
-const INTERVALO_MINUTOS = 40; // duração média de cada atendimento
-const HORARIO_SEMANA = { abre: "08:00", fecha: "20:00" }; // seg a sex
-const HORARIO_SABADO = { abre: "08:00", fecha: "18:00" };
-
-function linkAvisoBarbeiro({ nome, telefone, servico, data, hora }) {
-  const texto =
-    `Novo agendamento na Máfia Barbearia!\n\n` +
-    `Nome: ${nome}\n` +
-    `Telefone: ${telefone}\n` +
-    `Serviço: ${servico}\n` +
-    `Data: ${formatarDataBR(data)}\n` +
-    `Horário: ${hora}`;
-  return `https://wa.me/${NUMERO_BARBEIRO}?text=${encodeURIComponent(texto)}`;
-}
 
 let dataAtual = new Date();
 let mesExibido = dataAtual.getMonth();
@@ -38,47 +20,24 @@ const calGrid = document.getElementById("calGrid");
 const calMonthLabel = document.getElementById("calMonthLabel");
 const calPrev = document.getElementById("calPrev");
 const calNext = document.getElementById("calNext");
-const turnoSelect = document.getElementById("turnoSelect"); // agora é a grade de horários
+const turnoSelect = document.getElementById("turnoSelect"); // grade de horários
+const barbeiroSelect = document.getElementById("barbeiroSelect");
+const servicoSelect = document.getElementById("servico");
 const form = document.getElementById("formAgendamento");
 const formMsg = document.getElementById("formMsg");
 
 function pad(n) { return String(n).padStart(2, "0"); }
 
-function minutosParaHora(min) {
-  return `${pad(Math.floor(min / 60))}:${pad(min % 60)}`;
-}
-
-function horaParaMinutos(hhmm) {
-  const [h, m] = hhmm.split(":").map(Number);
-  return h * 60 + m;
-}
-
-// Gera a lista de horários possíveis pra uma data, já removendo
-// horários no passado se a data escolhida for hoje.
-function gerarHorariosDoDia(iso) {
-  const [ano, mes, dia] = iso.split("-").map(Number);
-  const dataObj = new Date(ano, mes - 1, dia);
-  const diaSemana = dataObj.getDay(); // 0 = domingo, 6 = sábado
-
-  if (diaSemana === 0) return []; // fechado aos domingos
-
-  const janela = diaSemana === 6 ? HORARIO_SABADO : HORARIO_SEMANA;
-  const inicio = horaParaMinutos(janela.abre);
-  const fim = horaParaMinutos(janela.fecha);
-
-  const horarios = [];
-  for (let m = inicio; m + INTERVALO_MINUTOS <= fim; m += INTERVALO_MINUTOS) {
-    horarios.push(minutosParaHora(m));
-  }
-
-  const hoje = new Date();
-  const ehHoje = dataObj.toDateString() === hoje.toDateString();
-  if (ehHoje) {
-    const agoraEmMinutos = hoje.getHours() * 60 + hoje.getMinutes();
-    return horarios.filter(h => horaParaMinutos(h) > agoraEmMinutos);
-  }
-
-  return horarios;
+function linkAvisoBarbeiro({ nome, telefone, servico, data, hora, whatsappBarbeiro, nomeBarbeiro }) {
+  const texto =
+    `Novo agendamento na Máfia Barbearia!\n\n` +
+    `Nome: ${nome}\n` +
+    `Telefone: ${telefone}\n` +
+    `Serviço: ${servico}\n` +
+    `Barbeiro: ${nomeBarbeiro || ""}\n` +
+    `Data: ${formatarDataBR(data)}\n` +
+    `Horário: ${hora}`;
+  return `https://wa.me/${whatsappBarbeiro}?text=${encodeURIComponent(texto)}`;
 }
 
 function renderCalendario() {
@@ -108,10 +67,9 @@ function renderCalendario() {
     btn.className = "cal-dia";
     btn.textContent = dia;
 
-    const ehDomingo = dataObj.getDay() === 0;
     const ehPassado = dataObj < hoje;
 
-    if (ehDomingo || ehPassado) {
+    if (ehPassado) {
       btn.classList.add("cal-dia--desabilitado");
       btn.disabled = true;
     } else {
@@ -120,7 +78,7 @@ function renderCalendario() {
         horaSelecionada = null;
         calGrid.querySelectorAll(".cal-dia").forEach(el => el.classList.remove("cal-dia--selecionado"));
         btn.classList.add("cal-dia--selecionado");
-        atualizarHorariosDisponiveis(iso);
+        atualizarHorariosDisponiveis();
       });
     }
 
@@ -130,31 +88,41 @@ function renderCalendario() {
   }
 }
 
-// Consulta os horários já ocupados naquele dia e desenha os botões
-async function atualizarHorariosDisponiveis(iso) {
-  if (!turnoSelect) return;
+// Consulta a disponibilidade real do barbeiro escolhido (horário de
+// trabalho + folgas/férias + agendamentos já feitos) direto no banco.
+async function atualizarHorariosDisponiveis() {
+  if (!turnoSelect || !dataSelecionada) return;
 
-  turnoSelect.innerHTML = `<span class="horario-aviso">Carregando horários...</span>`;
-
-  const todosHorarios = gerarHorariosDoDia(iso);
-
-  if (!todosHorarios.length) {
-    turnoSelect.innerHTML = `<span class="horario-aviso">Fechado nesse dia. Escolha outra data.</span>`;
+  const barbeiroId = barbeiroSelect ? barbeiroSelect.value : null;
+  if (!barbeiroId) {
+    turnoSelect.innerHTML = `<span class="horario-aviso">Escolha um barbeiro primeiro.</span>`;
     return;
   }
 
-  const { data: ocupados, error } = await supabase.rpc("horarios_ocupados", { p_data: iso });
-  const horariosOcupados = error ? [] : (ocupados || []).map(o => o.hora.slice(0, 5));
+  turnoSelect.innerHTML = `<span class="horario-aviso">Carregando horários...</span>`;
+
+  const { data: horarios, error } = await supabase.rpc("horarios_disponiveis", {
+    p_barbeiro_id: barbeiroId,
+    p_data: dataSelecionada
+  });
+
+  if (error) {
+    console.error(error);
+    turnoSelect.innerHTML = `<span class="horario-aviso">Não deu pra carregar os horários. Tenta de novo.</span>`;
+    return;
+  }
+
+  if (!horarios || !horarios.length) {
+    turnoSelect.innerHTML = `<span class="horario-aviso">Sem horários disponíveis nesse dia. Escolha outra data.</span>`;
+    return;
+  }
 
   turnoSelect.innerHTML = "";
-  todosHorarios.forEach(hora => {
-    const lotado = horariosOcupados.includes(hora);
+  horarios.forEach(hora => {
     const btn = document.createElement("button");
     btn.type = "button";
     btn.className = "turno-btn";
-    btn.textContent = lotado ? `${hora} · Ocupado` : hora;
-    btn.disabled = lotado;
-    if (lotado) btn.classList.add("turno-btn--lotado");
+    btn.textContent = hora;
 
     btn.addEventListener("click", () => {
       turnoSelect.querySelectorAll(".turno-btn").forEach(b => b.classList.remove("turno-btn--ativo"));
@@ -180,6 +148,14 @@ if (calPrev && calNext) {
   renderCalendario();
 }
 
+// Se trocar de barbeiro com uma data já escolhida, atualiza os horários
+if (barbeiroSelect) {
+  barbeiroSelect.addEventListener("change", () => {
+    horaSelecionada = null;
+    if (dataSelecionada) atualizarHorariosDisponiveis();
+  });
+}
+
 /* ---------- ENVIAR AGENDAMENTO ---------- */
 if (form) {
   form.addEventListener("submit", async (e) => {
@@ -188,10 +164,21 @@ if (form) {
     const nome = document.getElementById("nome").value.trim();
     const telefone = document.getElementById("telefone").value.trim();
     const email = document.getElementById("email").value.trim().toLowerCase();
-    const servico = document.getElementById("servico").value;
+    const servicoId = servicoSelect.value;
+    const servicoNome = servicoSelect.selectedOptions[0]?.dataset.nome || servicoSelect.selectedOptions[0]?.textContent || "";
+    const barbeiroId = barbeiroSelect ? barbeiroSelect.value : null;
+    const barbeiroNome = barbeiroSelect ? barbeiroSelect.selectedOptions[0]?.textContent : "";
 
     if (!nome || !telefone || !email) {
       mostrarMsg("Preencha nome, telefone e e-mail.", false);
+      return;
+    }
+    if (!barbeiroId) {
+      mostrarMsg("Escolha um barbeiro.", false);
+      return;
+    }
+    if (!servicoId) {
+      mostrarMsg("Escolha um serviço.", false);
       return;
     }
     if (!dataSelecionada) {
@@ -208,8 +195,11 @@ if (form) {
     mostrarMsg("Enviando...", true);
 
     const { error } = await supabase.from("agendamentos").insert([{
-      nome, telefone, email, servico,
-      barbeiro: "Rian",
+      nome, telefone, email,
+      servico: servicoNome,
+      servico_id: servicoId,
+      barbeiro: barbeiroNome,
+      barbeiro_id: barbeiroId,
       data: dataSelecionada,
       hora: `${horaSelecionada}:00`,
       status: "pendente"
@@ -219,29 +209,49 @@ if (form) {
       console.error(error);
       if (error.code === "23505") {
         mostrarMsg("Esse horário acabou de ser reservado por outra pessoa. Escolha outro.", false);
-        atualizarHorariosDisponiveis(dataSelecionada);
+        atualizarHorariosDisponiveis();
       } else {
         mostrarMsg("Não deu pra enviar agora. Tenta de novo em instantes.", false);
       }
-    } else {
-      const linkAviso = linkAvisoBarbeiro({ nome, telefone, servico, data: dataSelecionada, hora: horaSelecionada });
-      formMsg.innerHTML = `
-        <p>Agendamento confirmado! Te esperamos por aqui. 💈</p>
-        <a href="${linkAviso}" target="_blank" rel="noopener" class="btn-whats aviso-whats-btn">Avisar Rian no WhatsApp</a>
-      `;
-      formMsg.classList.add("success");
-      form.reset();
-      const dataConfirmada = dataSelecionada;
-      dataSelecionada = null;
-      horaSelecionada = null;
-      renderCalendario();
-      if (turnoSelect) {
-        turnoSelect.innerHTML = `<span class="horario-aviso">Escolha uma data no calendário para ver os horários disponíveis.</span>`;
-      }
+      btn.disabled = false;
+      return;
+    }
+
+    // Busca o WhatsApp do barbeiro escolhido pra montar o link de aviso
+    const { data: barbeiroInfo } = await supabase
+      .from("barbeiros")
+      .select("whatsapp, nome")
+      .eq("id", barbeiroId)
+      .single();
+
+    const numeroWhats = barbeiroInfo?.whatsapp;
+    const nomeBarbeiroConfirmado = barbeiroInfo?.nome || barbeiroNome;
+
+    let avisoHTML = "";
+    if (numeroWhats) {
+      const linkAviso = linkAvisoBarbeiro({
+        nome, telefone, servico: servicoNome, data: dataSelecionada, hora: horaSelecionada,
+        whatsappBarbeiro: numeroWhats, nomeBarbeiro: nomeBarbeiroConfirmado
+      });
+      avisoHTML = `<a href="${linkAviso}" target="_blank" rel="noopener" class="btn-whats aviso-whats-btn">Avisar ${escapeHTMLLeve(nomeBarbeiroConfirmado)} no WhatsApp</a>`;
+    }
+
+    formMsg.innerHTML = `<p>Agendamento confirmado! Te esperamos por aqui. 💈</p>${avisoHTML}`;
+    formMsg.classList.add("success");
+    form.reset();
+    dataSelecionada = null;
+    horaSelecionada = null;
+    renderCalendario();
+    if (turnoSelect) {
+      turnoSelect.innerHTML = `<span class="horario-aviso">Escolha uma data no calendário para ver os horários disponíveis.</span>`;
     }
 
     btn.disabled = false;
   });
+}
+
+function escapeHTMLLeve(str) {
+  return String(str ?? "").replace(/[&<>"']/g, c => ({ "&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;" }[c]));
 }
 
 function mostrarMsg(texto, sucesso) {
@@ -282,10 +292,10 @@ async function buscarPorEmail() {
     <div class="plano-item">
       <div class="plano-item-data">
         <strong>${formatarDataBR(item.data)}</strong>
-        <span>${item.hora ? item.hora.slice(0, 5) : (NOMES_TURNO[item.turno] || item.turno)}</span>
+        <span>${item.hora ? item.hora.slice(0, 5) : "—"}</span>
       </div>
       <div class="plano-item-info">
-        <span>${item.servico}</span>
+        <span>${item.servico}${item.barbeiro ? " · " + item.barbeiro : ""}</span>
         <span class="plano-status plano-status--${item.status || "pendente"}">${item.status || "pendente"}</span>
       </div>
     </div>
