@@ -128,7 +128,7 @@ function itemHTML(item) {
     <div class="admin-item" data-id="${item.id}">
       <div class="admin-item-main">
         <strong>${item.nome}</strong>
-        <span>${NOMES_TURNO[item.turno] || item.turno} · ${item.servico}</span>
+        <span>${item.hora ? item.hora.slice(0,5) : (NOMES_TURNO[item.turno] || item.turno)} · ${item.servico}</span>
         <span class="status-pill status-pill--${status}">${NOMES_STATUS[status] || status}</span>
       </div>
       <div class="admin-item-contato">
@@ -232,7 +232,8 @@ async function carregarAgendamentos() {
   const { data: agendamentos, error } = await supabase
     .from("agendamentos")
     .select("*")
-    .order("data", { ascending: true });
+    .order("data", { ascending: true })
+    .order("hora", { ascending: true });
 
   if (error) {
     lista.innerHTML = `<p class="plano-vazio">Erro ao carregar agendamentos.</p>`;
