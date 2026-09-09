@@ -135,61 +135,8 @@
       <p class="section-note">Técnica apurada, materiais de qualidade e um padrão de acabamento que não deixa nada ao acaso.</p>
     </div>
 
-    <div class="servicos-grid reveal">
-      <div class="servico-card">
-        <span class="servico-num">01</span>
-        <h3>Corte Masculino</h3>
-        <p>Cortes modernos e clássicos com acabamento preciso.</p>
-        <div class="servico-foot">
-          <span class="servico-preco servico-preco--consulte">Consulte o valor</span>
-          <a href="#agendamento" class="btn-mini">Agendar</a>
-        </div>
-      </div>
-      <div class="servico-card">
-        <span class="servico-num">02</span>
-        <h3>Barba</h3>
-        <p>Modelagem e alinhamento com máxima precisão.</p>
-        <div class="servico-foot">
-          <span class="servico-preco servico-preco--consulte">Consulte o valor</span>
-          <a href="#agendamento" class="btn-mini">Agendar</a>
-        </div>
-      </div>
-      <div class="servico-card">
-        <span class="servico-num">03</span>
-        <h3>Corte + Barba</h3>
-        <p>Visual completo com atenção aos detalhes.</p>
-        <div class="servico-foot">
-          <span class="servico-preco servico-preco--consulte">Consulte o valor</span>
-          <a href="#agendamento" class="btn-mini">Agendar</a>
-        </div>
-      </div>
-      <div class="servico-card">
-        <span class="servico-num">04</span>
-        <h3>Pigmentação</h3>
-        <p>Mais definição e acabamento, sem parecer artificial.</p>
-        <div class="servico-foot">
-          <span class="servico-preco servico-preco--consulte">Consulte o valor</span>
-          <a href="#agendamento" class="btn-mini">Agendar</a>
-        </div>
-      </div>
-      <div class="servico-card">
-        <span class="servico-num">05</span>
-        <h3>Acabamento</h3>
-        <p>Os detalhes que fazem a diferença no resultado final.</p>
-        <div class="servico-foot">
-          <span class="servico-preco servico-preco--consulte">Consulte o valor</span>
-          <a href="#agendamento" class="btn-mini">Agendar</a>
-        </div>
-      </div>
-      <div class="servico-card">
-        <span class="servico-num">06</span>
-        <h3>Sobrancelha</h3>
-        <p>Design e alinhamento que fecham o visual com precisão.</p>
-        <div class="servico-foot">
-          <span class="servico-preco servico-preco--consulte">Consulte o valor</span>
-          <a href="#agendamento" class="btn-mini">Agendar</a>
-        </div>
-      </div>
+    <div class="servicos-grid reveal" id="servicosGrid">
+      <p class="plano-vazio">Carregando serviços...</p>
     </div>
   </div>
 </section>
@@ -205,19 +152,8 @@
       <p class="section-note">Técnica, atenção e experiência em cada detalhe — em cada corte.</p>
     </div>
 
-    <div class="equipe-grid equipe-grid--single reveal">
-      <div class="barbeiro-card">
-        <div class="barbeiro-foto">
-          <img src="rian.jpg" alt="Rian, barbeiro da Máfia Barbearia" loading="lazy">
-        </div>
-        <div class="barbeiro-overlay"></div>
-        <div class="barbeiro-info">
-          <span class="barbeiro-especialidade">Barbeiro titular</span>
-          <h3>Rian</h3>
-          <p class="barbeiro-frase">"Corte é técnica. Estilo é atitude."</p>
-          <a href="rian.html" class="btn btn-mini">Ver perfil de Rian</a>
-        </div>
-      </div>
+    <div class="equipe-grid reveal" id="equipeGrid">
+      <p class="plano-vazio">Carregando equipe...</p>
     </div>
   </div>
 </section>
@@ -316,18 +252,18 @@
     </div>
 
     <div class="horarios-wrap reveal">
-      <div class="horarios-grid">
+      <div class="horarios-grid" id="horariosGrid">
         <div class="horario-row">
           <span class="horario-dia">Segunda — Sexta</span>
-          <span class="horario-horas">08h às 20h</span>
+          <span class="horario-horas" id="hSegSex">—</span>
         </div>
         <div class="horario-row">
           <span class="horario-dia">Sábado</span>
-          <span class="horario-horas">08h às 18h</span>
+          <span class="horario-horas" id="hSabado">—</span>
         </div>
-        <div class="horario-row fechado">
+        <div class="horario-row fechado" id="hDomingoRow">
           <span class="horario-dia">Domingo</span>
-          <span class="horario-horas">Fechado</span>
+          <span class="horario-horas" id="hDomingo">Fechado</span>
         </div>
       </div>
 
@@ -392,14 +328,15 @@
               <input type="email" id="email" placeholder="seu@email.com" required>
             </div>
             <div class="form-group full">
+              <label for="barbeiroSelect">Barbeiro</label>
+              <select id="barbeiroSelect" required>
+                <option value="">Carregando...</option>
+              </select>
+            </div>
+            <div class="form-group full">
               <label for="servico">Serviço</label>
-              <select id="servico">
-                <option value="Corte Masculino">Corte Masculino</option>
-                <option value="Barba">Barba</option>
-                <option value="Corte + Barba">Corte + Barba</option>
-                <option value="Pigmentação">Pigmentação</option>
-                <option value="Acabamento">Acabamento</option>
-                <option value="Sobrancelha">Sobrancelha</option>
+              <select id="servico" required>
+                <option value="">Carregando...</option>
               </select>
             </div>
           </div>
@@ -463,27 +400,26 @@
       <div class="contato-info">
         <div class="contato-item">
           <span class="contato-label">Endereço</span>
-          <span>Rua Paulo Fabiano de Assis, 525</span>
-          <span>Bairro Nova Esperança das Graças</span>
-          <span>Lagoa da Prata — MG</span>
+          <span id="ctEndereco">Carregando...</span>
         </div>
         <div class="contato-item">
           <span class="contato-label">Telefone</span>
-          <a href="tel:+5537998619864">(37) 99861-9864</a>
+          <a id="ctTelefoneLink" href="#">Carregando...</a>
         </div>
         <div class="contato-item">
           <span class="contato-label">Instagram</span>
-          <a href="https://instagram.com/mafiabarbearia" target="_blank" rel="noopener">@mafiabarbearia</a>
+          <a id="ctInstagramLink" href="#" target="_blank" rel="noopener">Carregando...</a>
         </div>
         <div class="contato-btns">
-          <a href="https://wa.me/5537998619864" target="_blank" rel="noopener" class="btn-whats">Chamar no WhatsApp</a>
-          <a href="https://www.google.com/maps/search/?api=1&query=Rua+Paulo+Fabiano+de+Assis+525+Lagoa+da+Prata+MG" target="_blank" rel="noopener" class="btn btn-outline">Ver localização</a>
+          <a id="ctWhatsBtn" href="#" target="_blank" rel="noopener" class="btn-whats">Chamar no WhatsApp</a>
+          <a id="ctMapaLink" href="#" target="_blank" rel="noopener" class="btn btn-outline">Ver localização</a>
         </div>
       </div>
 
       <div class="mapa-frame">
         <iframe
-          src="https://www.google.com/maps?q=Rua+Paulo+Fabiano+de+Assis+525+Lagoa+da+Prata+MG&output=embed"
+          id="ctMapaFrame"
+          src=""
           loading="lazy"
           referrerpolicy="no-referrer-when-downgrade"
           title="Localização Máfia Barbearia">
@@ -499,7 +435,7 @@
     <div class="footer-top">
       <div class="footer-brand">
         <span class="logo-top">MÁFIA</span>
-        <p class="footer-tag">Máfia Barbearia — estilo, atitude e precisão.</p>
+        <p class="footer-tag" id="ftTagline">Máfia Barbearia — estilo, atitude e precisão.</p>
       </div>
 
       <div class="footer-cols">
@@ -512,27 +448,28 @@
         </div>
         <div class="footer-col">
           <h4>Contato</h4>
-          <span>(37) 99861-9864</span>
-          <span>Lagoa da Prata — MG</span>
-          <a href="https://instagram.com/mafiabarbearia" target="_blank" rel="noopener">@mafiabarbearia</a>
+          <span id="ftTelefone">—</span>
+          <span id="ftEndereco">—</span>
+          <a id="ftInstagram" href="#" target="_blank" rel="noopener">—</a>
         </div>
         <div class="footer-col">
           <h4>Horário</h4>
-          <span>Seg—Sex · 08h—20h</span>
-          <span>Sábado · 08h—18h</span>
-          <span>Domingo · Fechado</span>
+          <span id="ftSegSex">—</span>
+          <span id="ftSabado">—</span>
+          <span id="ftDomingo">Domingo · Fechado</span>
         </div>
       </div>
     </div>
 
     <div class="footer-bottom">
-      <span>© 2026 Máfia Barbearia — Todos os direitos reservados.</span>
-      <span>Lagoa da Prata, MG · <a href="admin.html" style="color:inherit;">Acesso administrativo</a></span>
+      <span>© 2026 <span id="ftNome">Máfia Barbearia</span> — Todos os direitos reservados.</span>
+      <span id="ftCidade">Lagoa da Prata, MG</span> · <a href="admin.html" style="color:inherit;">Acesso administrativo</a>
     </div>
   </div>
 </footer>
 
 <script src="scripts.js"></script>
+<script type="module" src="conteudo.js"></script>
 <script type="module" src="agendamento.js"></script>
 </body>
 </html>
