@@ -60,7 +60,7 @@ async function renderServicos() {
 
   if (selectServico) {
     selectServico.innerHTML = data.length
-      ? data.map(s => `<option value="${s.id}" data-nome="${escapeHTML(s.nome)}">${escapeHTML(s.nome)} — ${formatarPreco(s.preco)}</option>`).join("")
+      ? data.map(s => `<option value="${s.id}" data-nome="${escapeHTML(s.nome)}" data-duracao="${s.duracao_minutos}">${escapeHTML(s.nome)} — ${formatarPreco(s.preco)}</option>`).join("")
       : `<option value="">Nenhum serviço disponível</option>`;
   }
 }
