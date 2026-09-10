@@ -40,6 +40,14 @@ const btnNovoServico = document.getElementById("btnNovoServico");
 const listaBarbeiros = document.getElementById("listaBarbeiros");
 const btnNovoBarbeiro = document.getElementById("btnNovoBarbeiro");
 
+/* ---------- Elementos: galeria ---------- */
+const listaGaleria = document.getElementById("listaGaleria");
+const inputNovaFoto = document.getElementById("inputNovaFoto");
+
+/* ---------- Elementos: depoimentos ---------- */
+const listaDepoimentos = document.getElementById("listaDepoimentos");
+const btnNovoDepoimento = document.getElementById("btnNovoDepoimento");
+
 /* ---------- Elementos: configurações ---------- */
 const formConfig = document.getElementById("formConfig");
 const configMsg = document.getElementById("configMsg");
@@ -130,7 +138,7 @@ btnLogout.addEventListener("click", async () => {
 });
 
 async function carregarTudo() {
-  await Promise.all([carregarServicos(), carregarBarbeiros()]);
+  await Promise.all([carregarServicos(), carregarBarbeiros(), carregarGaleria(), carregarDepoimentos()]);
   await carregarAgendamentos();
   await carregarConfig();
 }
@@ -663,6 +671,181 @@ async function carregarIndisponibilidades(barbeiroId, form) {
     carregarIndisponibilidades(barbeiroId, form);
   };
 }
+
+/* ===================================================================
+   GALERIA DE TRABALHOS
+   =================================================================== */
+
+function galeriaCardHTML(g) {
+  return `
+    <div class="galeria-card" data-id="${g.id}">
+      <img src="${g.foto_url}" alt="${escapeHTML(g.legenda || "")}">
+      <div class="galeria-card-corpo">
+        <input type="text" class="f-legenda" value="${escapeHTML(g.legenda || "")}" placeholder="Legenda (opcional)">
+        <div class="galeria-card-acoes">
+          <label style="font-size:12px;color:var(--gray-500);display:flex;gap:6px;align-items:center;">
+            <input type="checkbox" class="f-ativo" ${g.ativo ? "checked" : ""}> Ativa
+          </label>
+          <div style="display:flex;gap:6px;">
+            <button class="btn-xs btn-salvar">Salvar</button>
+            <button class="btn-xs btn-xs--perigo btn-excluir">Excluir</button>
+          </div>
+        </div>
+      </div>
+    </div>`;
+}
+
+async function carregarGaleria() {
+  listaGaleria.innerHTML = `<p class="plano-vazio">Carregando galeria...</p>`;
+  const { data, error } = await supabase.from("galeria").select("*").order("ordem", { ascending: true });
+  if (error) { console.error(error); listaGaleria.innerHTML = `<p class="plano-vazio">Erro ao carregar galeria.</p>`; return; }
+
+  if (!data || !data.length) {
+    listaGaleria.innerHTML = `<p class="plano-vazio">Nenhuma foto ainda. O site mostra as ilustrações padrão até você adicionar fotos reais.</p>`;
+    return;
+  }
+
+  listaGaleria.innerHTML = data.map(galeriaCardHTML).join("");
+
+  listaGaleria.querySelectorAll(".galeria-card").forEach(card => {
+    const id = card.dataset.id;
+
+    card.querySelector(".btn-salvar").addEventListener("click", async () => {
+      const { error: erroUpd } = await supabase.from("galeria").update({
+        legenda: card.querySelector(".f-legenda").value.trim(),
+        ativo: card.querySelector(".f-ativo").checked
+      }).eq("id", id);
+      if (erroUpd) { console.error(erroUpd); alert("Não foi possível salvar."); }
+    });
+
+    card.querySelector(".btn-excluir").addEventListener("click", async () => {
+      if (!confirm("Excluir esta foto?")) return;
+      const { error: erroDel } = await supabase.from("galeria").delete().eq("id", id);
+      if (erroDel) { console.error(erroDel); alert("Não foi possível excluir."); }
+      else carregarGaleria();
+    });
+  });
+}
+
+inputNovaFoto.addEventListener("change", async () => {
+  const arquivo = inputNovaFoto.files[0];
+  if (!arquivo) return;
+
+  const caminho = `${Date.now()}-${arquivo.name}`;
+  const { error: erroUpload } = await supabase.storage.from("galeria").upload(caminho, arquivo);
+  if (erroUpload) { console.error(erroUpload); alert("Não foi possível enviar a foto."); return; }
+
+  const { data: pub } = supabase.storage.from("galeria").getPublicUrl(caminho);
+
+  const { error: erroInsert } = await supabase.from("galeria").insert([{
+    foto_url: pub.publicUrl, ativo: true, ordem: 0
+  }]);
+  if (erroInsert) { console.error(erroInsert); alert("Não foi possível salvar a foto."); return; }
+
+  inputNovaFoto.value = "";
+  carregarGaleria();
+});
+
+/* ===================================================================
+   DEPOIMENTOS
+   =================================================================== */
+
+function depoimentoCardHTML(d) {
+  const estrelasView = "★".repeat(d.nota) + "☆".repeat(5 - d.nota);
+  return `
+    <div class="crud-card depoimento-card" data-id="${d.id}">
+      <div class="crud-card-topo">
+        <span class="crud-card-nome">
+          ${escapeHTML(d.nome_cliente)}
+          <span style="color:#d8c07a;font-size:13px;">${estrelasView}</span>
+          <span class="crud-badge ${d.ativo ? "crud-badge--ativo" : "crud-badge--inativo"}">${d.ativo ? "Ativo" : "Inativo"}</span>
+        </span>
+        <div class="crud-card-acoes">
+          <button class="btn-xs btn-editar">Editar</button>
+          <button class="btn-xs btn-xs--perigo btn-excluir">Excluir</button>
+        </div>
+      </div>
+
+      <form class="crud-form" style="display:none;">
+        <div class="form-group"><label>Nome do cliente</label><input type="text" class="f-nome" value="${escapeHTML(d.nome_cliente)}" required></div>
+        <div class="form-group">
+          <label>Nota</label>
+          <div class="estrelas-input" data-valor="${d.nota}">
+            ${[1,2,3,4,5].map(n => `<span data-n="${n}" class="${n <= d.nota ? "ativa" : ""}">★</span>`).join("")}
+          </div>
+        </div>
+        <div class="form-group crud-form-full"><label>Depoimento</label><textarea class="f-texto" required>${escapeHTML(d.texto)}</textarea></div>
+        <div class="form-group form-group--check"><label><input type="checkbox" class="f-ativo" ${d.ativo ? "checked" : ""}> Depoimento ativo (aparece no site)</label></div>
+        <div class="crud-form-full" style="display:flex;gap:10px;align-items:center;">
+          <button type="submit" class="btn-submit" style="max-width:160px;">Salvar</button>
+          <span class="admin-msg f-msg"></span>
+        </div>
+      </form>
+    </div>`;
+}
+
+async function carregarDepoimentos() {
+  listaDepoimentos.innerHTML = `<p class="plano-vazio">Carregando depoimentos...</p>`;
+  const { data, error } = await supabase.from("depoimentos").select("*").order("ordem", { ascending: true });
+  if (error) { console.error(error); listaDepoimentos.innerHTML = `<p class="plano-vazio">Erro ao carregar depoimentos.</p>`; return; }
+
+  if (!data || !data.length) {
+    listaDepoimentos.innerHTML = `<p class="plano-vazio">Nenhum depoimento cadastrado ainda.</p>`;
+    return;
+  }
+
+  listaDepoimentos.innerHTML = data.map(depoimentoCardHTML).join("");
+
+  listaDepoimentos.querySelectorAll(".depoimento-card").forEach(card => {
+    const id = card.dataset.id;
+    const form = card.querySelector(".crud-form");
+    const estrelas = form.querySelector(".estrelas-input");
+
+    card.querySelector(".btn-editar").addEventListener("click", () => {
+      form.style.display = form.style.display === "none" ? "grid" : "none";
+    });
+
+    card.querySelector(".btn-excluir").addEventListener("click", async () => {
+      if (!confirm("Excluir este depoimento?")) return;
+      const { error: erroDel } = await supabase.from("depoimentos").delete().eq("id", id);
+      if (erroDel) { console.error(erroDel); alert("Não foi possível excluir."); }
+      else carregarDepoimentos();
+    });
+
+    estrelas.querySelectorAll("span").forEach(s => {
+      s.addEventListener("click", () => {
+        const n = parseInt(s.dataset.n, 10);
+        estrelas.dataset.valor = n;
+        estrelas.querySelectorAll("span").forEach(s2 => s2.classList.toggle("ativa", parseInt(s2.dataset.n, 10) <= n));
+      });
+    });
+
+    form.addEventListener("submit", async (e) => {
+      e.preventDefault();
+      const msg = form.querySelector(".f-msg");
+      msg.textContent = "Salvando...";
+
+      const { error: erroUpd } = await supabase.from("depoimentos").update({
+        nome_cliente: form.querySelector(".f-nome").value.trim(),
+        texto: form.querySelector(".f-texto").value.trim(),
+        nota: parseInt(estrelas.dataset.valor, 10),
+        ativo: form.querySelector(".f-ativo").checked
+      }).eq("id", id);
+
+      if (erroUpd) { console.error(erroUpd); msg.textContent = "Erro ao salvar."; return; }
+      msg.textContent = "Salvo!";
+      setTimeout(() => carregarDepoimentos(), 500);
+    });
+  });
+}
+
+btnNovoDepoimento.addEventListener("click", async () => {
+  const { error } = await supabase.from("depoimentos").insert([{
+    nome_cliente: "Novo cliente", texto: "Escreva aqui o depoimento.", nota: 5, ativo: false
+  }]);
+  if (error) { console.error(error); alert("Não foi possível criar."); return; }
+  carregarDepoimentos();
+});
 
 /* ===================================================================
    CONFIGURAÇÕES GERAIS
