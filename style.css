@@ -426,6 +426,28 @@ header{
   color:var(--gray-300);
 }
 
+/* ============ DEPOIMENTOS ============ */
+.depoimentos-grid{
+  display:grid;
+  grid-template-columns:repeat(auto-fit,minmax(280px,1fr));
+  gap:1px;
+  background:var(--line-soft);
+  border:1px solid var(--line-soft);
+}
+.depoimento-card{
+  background:var(--bg-2);
+  padding:30px 28px;
+}
+.depoimento-estrelas{color:#d8c07a;font-size:15px;letter-spacing:2px;margin-bottom:14px;}
+.depoimento-texto{color:var(--gray-300);font-size:14.5px;line-height:1.7;margin-bottom:18px;}
+.depoimento-nome{
+  font-family:'Oswald',sans-serif;
+  font-size:13px;
+  letter-spacing:.04em;
+  text-transform:uppercase;
+  color:var(--gray-600);
+}
+
 /* ============ HORÁRIOS ============ */
 .horarios-wrap{
   display:grid;
@@ -745,6 +767,23 @@ footer{
 .plano-status--confirmado{color:#a8c99a;border-color:rgba(168,201,154,0.4);}
 .plano-status--concluido{color:var(--gray-600);}
 .plano-status--pendente{color:#d8c07a;border-color:rgba(216,192,122,0.4);}
+.plano-status--cancelado{color:#e08a8a;border-color:rgba(224,138,138,0.4);}
+
+.btn-xs-cancelar{
+  width:100%;
+  margin-top:4px;
+  padding:8px;
+  border:1px solid var(--line-soft);
+  border-radius:var(--radius);
+  color:var(--gray-500);
+  font-family:'Oswald',sans-serif;
+  font-size:11.5px;
+  letter-spacing:.04em;
+  text-transform:uppercase;
+  transition:all .2s;
+}
+.btn-xs-cancelar:hover{color:#e08a8a;border-color:rgba(224,138,138,0.5);}
+.btn-xs-cancelar:disabled{opacity:0.5;cursor:not-allowed;}
 
 .divisor-form{
   display:flex;align-items:center;gap:16px;
@@ -1266,6 +1305,36 @@ footer{
 }
 .btn-xs:hover{color:var(--gray-100);border-color:var(--gray-100);}
 .btn-xs--perigo:hover{color:#e08a8a;border-color:rgba(224,138,138,0.5);}
+
+.admin-crud-lista--grid{
+  display:grid;
+  grid-template-columns:repeat(auto-fill,minmax(180px,1fr));
+  gap:14px;
+}
+.galeria-card{
+  background:var(--bg-2);
+  border:1px solid var(--line-soft);
+  border-radius:var(--radius);
+  overflow:hidden;
+}
+.galeria-card img{width:100%;aspect-ratio:4/3;object-fit:cover;display:block;}
+.galeria-card-corpo{padding:12px 14px;}
+.galeria-card input[type="text"]{
+  width:100%;
+  background:var(--bg-1);
+  border:1px solid var(--line);
+  border-radius:6px;
+  color:var(--gray-100);
+  padding:7px 9px;
+  font-size:12.5px;
+  margin-bottom:8px;
+}
+.galeria-card-acoes{display:flex;justify-content:space-between;align-items:center;gap:8px;}
+
+.depoimento-card .crud-form{grid-template-columns:1fr 120px;}
+.estrelas-input{display:flex;gap:4px;font-size:20px;}
+.estrelas-input span{cursor:pointer;color:var(--line-soft);}
+.estrelas-input span.ativa{color:#d8c07a;}
 
 @media (max-width:900px){
   .admin-stats{grid-template-columns:repeat(2,1fr);}
