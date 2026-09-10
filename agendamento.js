@@ -288,8 +288,10 @@ async function buscarPorEmail() {
     return;
   }
 
-  planoResultados.innerHTML = data.map(item => `
-    <div class="plano-item">
+  planoResultados.innerHTML = data.map(item => {
+    const podeCancel = item.status !== "cancelado" && item.status !== "concluido";
+    return `
+    <div class="plano-item" data-id="${item.id}">
       <div class="plano-item-data">
         <strong>${formatarDataBR(item.data)}</strong>
         <span>${item.hora ? item.hora.slice(0, 5) : "—"}</span>
@@ -298,8 +300,31 @@ async function buscarPorEmail() {
         <span>${item.servico}${item.barbeiro ? " · " + item.barbeiro : ""}</span>
         <span class="plano-status plano-status--${item.status || "pendente"}">${item.status || "pendente"}</span>
       </div>
-    </div>
-  `).join("");
+      ${podeCancel ? `<button type="button" class="btn-xs-cancelar" data-id="${item.id}">Cancelar agendamento</button>` : ""}
+    </div>`;
+  }).join("");
+
+  planoResultados.querySelectorAll(".btn-xs-cancelar").forEach(btn => {
+    btn.addEventListener("click", async () => {
+      if (!confirm("Cancelar esse agendamento? Essa ação não pode ser desfeita.")) return;
+      btn.disabled = true;
+      btn.textContent = "Cancelando...";
+
+      const { data: sucesso, error } = await supabase.rpc("cancelar_agendamento_cliente", {
+        p_id: btn.dataset.id,
+        p_email: email
+      });
+
+      if (error || !sucesso) {
+        console.error(error);
+        alert("Não foi possível cancelar. Tenta de novo ou chama a barbearia.");
+        btn.disabled = false;
+        btn.textContent = "Cancelar agendamento";
+      } else {
+        buscarPorEmail();
+      }
+    });
+  });
 }
 
 function formatarDataBR(iso) {
