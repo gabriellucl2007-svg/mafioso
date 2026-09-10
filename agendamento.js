@@ -89,7 +89,8 @@ function renderCalendario() {
 }
 
 // Consulta a disponibilidade real do barbeiro escolhido (horário de
-// trabalho + folgas/férias + agendamentos já feitos) direto no banco.
+// trabalho + folgas/férias + agendamentos já feitos, considerando a
+// duração do serviço escolhido) direto no banco.
 async function atualizarHorariosDisponiveis() {
   if (!turnoSelect || !dataSelecionada) return;
 
@@ -99,11 +100,16 @@ async function atualizarHorariosDisponiveis() {
     return;
   }
 
+  const duracaoSelecionada = servicoSelect?.selectedOptions[0]?.dataset.duracao
+    ? parseInt(servicoSelect.selectedOptions[0].dataset.duracao, 10)
+    : null;
+
   turnoSelect.innerHTML = `<span class="horario-aviso">Carregando horários...</span>`;
 
   const { data: horarios, error } = await supabase.rpc("horarios_disponiveis", {
     p_barbeiro_id: barbeiroId,
-    p_data: dataSelecionada
+    p_data: dataSelecionada,
+    p_duracao_minutos: duracaoSelecionada
   });
 
   if (error) {
@@ -148,9 +154,16 @@ if (calPrev && calNext) {
   renderCalendario();
 }
 
-// Se trocar de barbeiro com uma data já escolhida, atualiza os horários
+// Se trocar de barbeiro ou de serviço com uma data já escolhida,
+// atualiza os horários (a duração do serviço muda o que fica disponível).
 if (barbeiroSelect) {
   barbeiroSelect.addEventListener("change", () => {
+    horaSelecionada = null;
+    if (dataSelecionada) atualizarHorariosDisponiveis();
+  });
+}
+if (servicoSelect) {
+  servicoSelect.addEventListener("change", () => {
     horaSelecionada = null;
     if (dataSelecionada) atualizarHorariosDisponiveis();
   });
