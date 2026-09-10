@@ -164,8 +164,121 @@ async function renderConfig() {
   }
 }
 
+/* ---------- GALERIA DE TRABALHOS ---------- */
+async function renderGaleria() {
+  const grid = document.getElementById("galeriaGrid");
+  if (!grid) return;
+
+  const { data, error } = await supabase
+    .from("galeria")
+    .select("*")
+    .eq("ativo", true)
+    .order("ordem", { ascending: true });
+
+  // Sem fotos reais ainda: mantém as ilustrações padrão que já estão no HTML.
+  if (error || !data || !data.length) return;
+
+  const tamanhos = ["g-big", "g-h1", "g-h1", "g-w2", "", ""];
+  grid.innerHTML = data.map((g, i) => `
+    <div class="g-item ${tamanhos[i % tamanhos.length]} galeria-tile">
+      <img src="${g.foto_url}" alt="${escapeHTML(g.legenda || "Trabalho da Máfia Barbearia")}" loading="lazy" style="width:100%;height:100%;object-fit:cover;">
+      ${g.legenda ? `<div class="galeria-label"><span>${escapeHTML(g.legenda)}</span></div>` : ""}
+    </div>
+  `).join("");
+}
+
+/* ---------- DEPOIMENTOS ---------- */
+async function renderDepoimentos() {
+  const secao = document.getElementById("depoimentos");
+  const grid = document.getElementById("depoimentosGrid");
+  if (!secao || !grid) return { media: null, total: 0 };
+
+  const { data, error } = await supabase
+    .from("depoimentos")
+    .select("*")
+    .eq("ativo", true)
+    .order("ordem", { ascending: true });
+
+  if (error || !data || !data.length) {
+    secao.style.display = "none";
+    return { media: null, total: 0 };
+  }
+
+  secao.style.display = "";
+  grid.innerHTML = data.map(d => `
+    <div class="depoimento-card">
+      <div class="depoimento-estrelas">${"★".repeat(d.nota)}${"☆".repeat(5 - d.nota)}</div>
+      <p class="depoimento-texto">"${escapeHTML(d.texto)}"</p>
+      <p class="depoimento-nome">${escapeHTML(d.nome_cliente)}</p>
+    </div>
+  `).join("");
+
+  const media = data.reduce((soma, d) => soma + d.nota, 0) / data.length;
+  return { media, total: data.length };
+}
+
+/* ---------- SEO LOCAL (dados estruturados para o Google) ---------- */
+function renderSEO(config, avaliacoes) {
+  if (!document.getElementById("servicosGrid")) return; // só na página inicial
+
+  const schema = {
+    "@context": "https://schema.org",
+    "@type": "HairSalon",
+    "name": config?.nome_barbearia || "Máfia Barbearia",
+    "image": `${window.location.origin}${window.location.pathname.replace("index.html", "")}favicon.svg`,
+    "telephone": config?.telefone || undefined,
+    "address": {
+      "@type": "PostalAddress",
+      "streetAddress": config?.endereco || undefined,
+      "addressLocality": "Lagoa da Prata",
+      "addressRegion": "MG",
+      "addressCountry": "BR"
+    },
+    "openingHoursSpecification": [
+      {
+        "@type": "OpeningHoursSpecification",
+        "dayOfWeek": ["Monday","Tuesday","Wednesday","Thursday","Friday"],
+        "opens": (config?.seg_sex_abre || "08:00").slice(0,5),
+        "closes": (config?.seg_sex_fecha || "20:00").slice(0,5)
+      },
+      {
+        "@type": "OpeningHoursSpecification",
+        "dayOfWeek": ["Saturday"],
+        "opens": (config?.sabado_abre || "08:00").slice(0,5),
+        "closes": (config?.sabado_fecha || "18:00").slice(0,5)
+      }
+    ]
+  };
+
+  if (avaliacoes && avaliacoes.media && avaliacoes.total > 0) {
+    schema.aggregateRating = {
+      "@type": "AggregateRating",
+      "ratingValue": avaliacoes.media.toFixed(1),
+      "reviewCount": avaliacoes.total
+    };
+  }
+
+  let tag = document.getElementById("schemaOrgBarbearia");
+  if (!tag) {
+    tag = document.createElement("script");
+    tag.type = "application/ld+json";
+    tag.id = "schemaOrgBarbearia";
+    document.head.appendChild(tag);
+  }
+  tag.textContent = JSON.stringify(schema);
+}
+
 renderServicos();
 renderEquipe();
+renderGaleria();
+
+Promise.all([
+  supabase.from("configuracoes").select("*").eq("id", 1).single(),
+]).then(async ([{ data: config }]) => {
+  const avaliacoes = await renderDepoimentos();
+  renderSEO(config, avaliacoes);
+});
+
 renderConfig();
 
 export {}; // mantém como módulo isolado
