@@ -44,10 +44,6 @@ const btnNovoBarbeiro = document.getElementById("btnNovoBarbeiro");
 const listaGaleria = document.getElementById("listaGaleria");
 const inputNovaFoto = document.getElementById("inputNovaFoto");
 
-/* ---------- Elementos: depoimentos ---------- */
-const listaDepoimentos = document.getElementById("listaDepoimentos");
-const btnNovoDepoimento = document.getElementById("btnNovoDepoimento");
-
 /* ---------- Elementos: configurações ---------- */
 const formConfig = document.getElementById("formConfig");
 const configMsg = document.getElementById("configMsg");
@@ -138,7 +134,7 @@ btnLogout.addEventListener("click", async () => {
 });
 
 async function carregarTudo() {
-  await Promise.all([carregarServicos(), carregarBarbeiros(), carregarGaleria(), carregarDepoimentos()]);
+  await Promise.all([carregarServicos(), carregarBarbeiros(), carregarGaleria()]);
   await carregarAgendamentos();
   await carregarConfig();
 }
@@ -744,107 +740,6 @@ inputNovaFoto.addEventListener("change", async () => {
 
   inputNovaFoto.value = "";
   carregarGaleria();
-});
-
-/* ===================================================================
-   DEPOIMENTOS
-   =================================================================== */
-
-function depoimentoCardHTML(d) {
-  const estrelasView = "★".repeat(d.nota) + "☆".repeat(5 - d.nota);
-  return `
-    <div class="crud-card depoimento-card" data-id="${d.id}">
-      <div class="crud-card-topo">
-        <span class="crud-card-nome">
-          ${escapeHTML(d.nome_cliente)}
-          <span style="color:#d8c07a;font-size:13px;">${estrelasView}</span>
-          <span class="crud-badge ${d.ativo ? "crud-badge--ativo" : "crud-badge--inativo"}">${d.ativo ? "Ativo" : "Inativo"}</span>
-        </span>
-        <div class="crud-card-acoes">
-          <button class="btn-xs btn-editar">Editar</button>
-          <button class="btn-xs btn-xs--perigo btn-excluir">Excluir</button>
-        </div>
-      </div>
-
-      <form class="crud-form" style="display:none;">
-        <div class="form-group"><label>Nome do cliente</label><input type="text" class="f-nome" value="${escapeHTML(d.nome_cliente)}" required></div>
-        <div class="form-group">
-          <label>Nota</label>
-          <div class="estrelas-input" data-valor="${d.nota}">
-            ${[1,2,3,4,5].map(n => `<span data-n="${n}" class="${n <= d.nota ? "ativa" : ""}">★</span>`).join("")}
-          </div>
-        </div>
-        <div class="form-group crud-form-full"><label>Depoimento</label><textarea class="f-texto" required>${escapeHTML(d.texto)}</textarea></div>
-        <div class="form-group form-group--check"><label><input type="checkbox" class="f-ativo" ${d.ativo ? "checked" : ""}> Depoimento ativo (aparece no site)</label></div>
-        <div class="crud-form-full" style="display:flex;gap:10px;align-items:center;">
-          <button type="submit" class="btn-submit" style="max-width:160px;">Salvar</button>
-          <span class="admin-msg f-msg"></span>
-        </div>
-      </form>
-    </div>`;
-}
-
-async function carregarDepoimentos() {
-  listaDepoimentos.innerHTML = `<p class="plano-vazio">Carregando depoimentos...</p>`;
-  const { data, error } = await supabase.from("depoimentos").select("*").order("ordem", { ascending: true });
-  if (error) { console.error(error); listaDepoimentos.innerHTML = `<p class="plano-vazio">Erro ao carregar depoimentos.</p>`; return; }
-
-  if (!data || !data.length) {
-    listaDepoimentos.innerHTML = `<p class="plano-vazio">Nenhum depoimento cadastrado ainda.</p>`;
-    return;
-  }
-
-  listaDepoimentos.innerHTML = data.map(depoimentoCardHTML).join("");
-
-  listaDepoimentos.querySelectorAll(".depoimento-card").forEach(card => {
-    const id = card.dataset.id;
-    const form = card.querySelector(".crud-form");
-    const estrelas = form.querySelector(".estrelas-input");
-
-    card.querySelector(".btn-editar").addEventListener("click", () => {
-      form.style.display = form.style.display === "none" ? "grid" : "none";
-    });
-
-    card.querySelector(".btn-excluir").addEventListener("click", async () => {
-      if (!confirm("Excluir este depoimento?")) return;
-      const { error: erroDel } = await supabase.from("depoimentos").delete().eq("id", id);
-      if (erroDel) { console.error(erroDel); alert("Não foi possível excluir."); }
-      else carregarDepoimentos();
-    });
-
-    estrelas.querySelectorAll("span").forEach(s => {
-      s.addEventListener("click", () => {
-        const n = parseInt(s.dataset.n, 10);
-        estrelas.dataset.valor = n;
-        estrelas.querySelectorAll("span").forEach(s2 => s2.classList.toggle("ativa", parseInt(s2.dataset.n, 10) <= n));
-      });
-    });
-
-    form.addEventListener("submit", async (e) => {
-      e.preventDefault();
-      const msg = form.querySelector(".f-msg");
-      msg.textContent = "Salvando...";
-
-      const { error: erroUpd } = await supabase.from("depoimentos").update({
-        nome_cliente: form.querySelector(".f-nome").value.trim(),
-        texto: form.querySelector(".f-texto").value.trim(),
-        nota: parseInt(estrelas.dataset.valor, 10),
-        ativo: form.querySelector(".f-ativo").checked
-      }).eq("id", id);
-
-      if (erroUpd) { console.error(erroUpd); msg.textContent = "Erro ao salvar."; return; }
-      msg.textContent = "Salvo!";
-      setTimeout(() => carregarDepoimentos(), 500);
-    });
-  });
-}
-
-btnNovoDepoimento.addEventListener("click", async () => {
-  const { error } = await supabase.from("depoimentos").insert([{
-    nome_cliente: "Novo cliente", texto: "Escreva aqui o depoimento.", nota: 5, ativo: false
-  }]);
-  if (error) { console.error(error); alert("Não foi possível criar."); return; }
-  carregarDepoimentos();
 });
 
 /* ===================================================================
