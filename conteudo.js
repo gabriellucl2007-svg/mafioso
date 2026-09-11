@@ -120,7 +120,8 @@ async function renderConfig() {
 
   const seg = `${(data.seg_sex_abre || "").slice(0,5).replace(":","h")} às ${(data.seg_sex_fecha || "").slice(0,5).replace(":","h")}`;
   const sab = `${(data.sabado_abre || "").slice(0,5).replace(":","h")} às ${(data.sabado_fecha || "").slice(0,5).replace(":","h")}`;
-  const domTexto = data.domingo_funciona ? "Aberto" : "Fechado";
+  const dom = `${(data.domingo_abre || "").slice(0,5).replace(":","h")} às ${(data.domingo_fecha || "").slice(0,5).replace(":","h")}`;
+  const domTexto = data.domingo_funciona ? dom : "Fechado";
   const whatsDigitos = soDigitos(data.whatsapp);
   const enderecoUrl = encodeURIComponent(data.endereco || "");
 
@@ -162,6 +163,8 @@ async function renderConfig() {
   if (document.getElementById("servicosGrid")) {
     document.title = `${data.nome_barbearia || "Máfia Barbearia"} — ${data.tagline || "Estilo, atitude e precisão"}`;
   }
+
+  return data;
 }
 
 /* ---------- GALERIA DE TRABALHOS ---------- */
@@ -187,38 +190,8 @@ async function renderGaleria() {
   `).join("");
 }
 
-/* ---------- DEPOIMENTOS ---------- */
-async function renderDepoimentos() {
-  const secao = document.getElementById("depoimentos");
-  const grid = document.getElementById("depoimentosGrid");
-  if (!secao || !grid) return { media: null, total: 0 };
-
-  const { data, error } = await supabase
-    .from("depoimentos")
-    .select("*")
-    .eq("ativo", true)
-    .order("ordem", { ascending: true });
-
-  if (error || !data || !data.length) {
-    secao.style.display = "none";
-    return { media: null, total: 0 };
-  }
-
-  secao.style.display = "";
-  grid.innerHTML = data.map(d => `
-    <div class="depoimento-card">
-      <div class="depoimento-estrelas">${"★".repeat(d.nota)}${"☆".repeat(5 - d.nota)}</div>
-      <p class="depoimento-texto">"${escapeHTML(d.texto)}"</p>
-      <p class="depoimento-nome">${escapeHTML(d.nome_cliente)}</p>
-    </div>
-  `).join("");
-
-  const media = data.reduce((soma, d) => soma + d.nota, 0) / data.length;
-  return { media, total: data.length };
-}
-
 /* ---------- SEO LOCAL (dados estruturados para o Google) ---------- */
-function renderSEO(config, avaliacoes) {
+function renderSEO(config) {
   if (!document.getElementById("servicosGrid")) return; // só na página inicial
 
   const schema = {
@@ -238,25 +211,23 @@ function renderSEO(config, avaliacoes) {
       {
         "@type": "OpeningHoursSpecification",
         "dayOfWeek": ["Monday","Tuesday","Wednesday","Thursday","Friday"],
-        "opens": (config?.seg_sex_abre || "08:00").slice(0,5),
-        "closes": (config?.seg_sex_fecha || "20:00").slice(0,5)
+        "opens": (config?.seg_sex_abre || "13:30").slice(0,5),
+        "closes": (config?.seg_sex_fecha || "23:00").slice(0,5)
       },
       {
         "@type": "OpeningHoursSpecification",
         "dayOfWeek": ["Saturday"],
         "opens": (config?.sabado_abre || "08:00").slice(0,5),
-        "closes": (config?.sabado_fecha || "18:00").slice(0,5)
+        "closes": (config?.sabado_fecha || "20:00").slice(0,5)
+      },
+      {
+        "@type": "OpeningHoursSpecification",
+        "dayOfWeek": ["Sunday"],
+        "opens": (config?.domingo_abre || "08:00").slice(0,5),
+        "closes": (config?.domingo_fecha || "14:00").slice(0,5)
       }
     ]
   };
-
-  if (avaliacoes && avaliacoes.media && avaliacoes.total > 0) {
-    schema.aggregateRating = {
-      "@type": "AggregateRating",
-      "ratingValue": avaliacoes.media.toFixed(1),
-      "reviewCount": avaliacoes.total
-    };
-  }
 
   let tag = document.getElementById("schemaOrgBarbearia");
   if (!tag) {
@@ -271,14 +242,6 @@ function renderSEO(config, avaliacoes) {
 renderServicos();
 renderEquipe();
 renderGaleria();
-
-Promise.all([
-  supabase.from("configuracoes").select("*").eq("id", 1).single(),
-]).then(async ([{ data: config }]) => {
-  const avaliacoes = await renderDepoimentos();
-  renderSEO(config, avaliacoes);
-});
-
-renderConfig();
+renderConfig().then(config => renderSEO(config));
 
 export {}; // mantém como módulo isolado
