@@ -3,10 +3,7 @@
 // com os dados reais do banco (funciona para qualquer barbeiro).
 // ===================================================================
 
-import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
-import { SUPABASE_URL, SUPABASE_ANON_KEY } from "./supabase-config.js";
-
-const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+import { supabase } from "./supabase-client.js";
 
 function escapeHTML(str) {
   return String(str ?? "").replace(/[&<>"']/g, c => ({
