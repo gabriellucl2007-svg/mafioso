@@ -2,10 +2,7 @@
 // ADMIN.JS — login, agendamentos, serviços, equipe e configurações.
 // ===================================================================
 
-import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
-import { SUPABASE_URL, SUPABASE_ANON_KEY } from "./supabase-config.js";
-
-const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+import { supabase } from "./supabase-client.js";
 
 /* ---------- Elementos: login / painel ---------- */
 const loginScreen = document.getElementById("adminLogin");
@@ -791,4 +788,5 @@ formConfig.addEventListener("submit", async (e) => {
   configMsg.classList.add("success");
 });
 
+verificarSessao();
 verificarSessao();
