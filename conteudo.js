@@ -4,10 +4,7 @@
 // aqui automaticamente, sem precisar mexer em código.
 // ===================================================================
 
-import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
-import { SUPABASE_URL, SUPABASE_ANON_KEY } from "./supabase-config.js";
-
-const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+import { supabase } from "./supabase-client.js";
 
 function escapeHTML(str) {
   return String(str ?? "").replace(/[&<>"']/g, c => ({
@@ -181,10 +178,9 @@ async function renderGaleria() {
   // Sem fotos reais ainda: mantém as ilustrações padrão que já estão no HTML.
   if (error || !data || !data.length) return;
 
-  const tamanhos = ["g-big", "g-h1", "g-h1", "g-w2", "", ""];
-  grid.innerHTML = data.map((g, i) => `
-    <div class="g-item ${tamanhos[i % tamanhos.length]} galeria-tile">
-      <img src="${g.foto_url}" alt="${escapeHTML(g.legenda || "Trabalho da Máfia Barbearia")}" loading="lazy" style="width:100%;height:100%;object-fit:cover;">
+  grid.innerHTML = data.map((g) => `
+    <div class="galeria-tile">
+      <img src="${g.foto_url}" alt="${escapeHTML(g.legenda || "Trabalho da Máfia Barbearia")}" loading="lazy">
       ${g.legenda ? `<div class="galeria-label"><span>${escapeHTML(g.legenda)}</span></div>` : ""}
     </div>
   `).join("");
