@@ -3,213 +3,482 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<meta name="robots" content="noindex, nofollow">
+<title>Máfia Barbearia — Estilo, atitude e precisão</title>
+<meta name="description" content="Máfia Barbearia. Cortes modernos, barba impecável e acabamento de precisão em Lagoa da Prata - MG.">
 <link rel="icon" type="image/svg+xml" href="favicon.svg">
-<title>Painel Admin — Máfia Barbearia</title>
+
+<meta property="og:type" content="website">
+<meta property="og:locale" content="pt_BR">
+<meta property="og:title" content="Máfia Barbearia — Estilo, atitude e precisão">
+<meta property="og:description" content="Cortes modernos, barba impecável e acabamento de precisão em Lagoa da Prata - MG. Agende pelo site.">
+<meta name="theme-color" content="#050505">
+
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Oswald:wght@500;600;700&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Oswald:wght@500;600;700&family=Bebas+Neue&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="style.css">
 </head>
-<body class="admin-body">
+<body>
 
-<div class="admin-login" id="adminLogin">
-  <div class="admin-login-card">
-    <span class="logo-top">MÁFIA</span>
-    <h1 class="admin-title">Painel administrativo</h1>
-    <p class="admin-sub">Acesso restrito. Entre com seu e-mail e senha de administrador.</p>
-    <form id="formLogin">
-      <div class="form-group full">
-        <label for="adminEmail">Usuário</label>
-        <input type="text" id="adminEmail" required>
+<!-- ============ HEADER ============ -->
+<header id="header">
+  <div class="header-inner">
+    <a href="#inicio" class="logo">
+      <svg class="logo-mark" viewBox="0 0 40 40" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <rect x="1" y="1" width="38" height="38" stroke="#C7C7C7" stroke-width="1.2"/>
+        <path d="M10 13L20 27M30 13L20 27M10 13L14 13M30 13L26 13" stroke="#E4E4E4" stroke-width="1.4" stroke-linecap="square"/>
+        <circle cx="20" cy="27" r="1.6" fill="#E4E4E4"/>
+      </svg>
+      <span class="logo-text">
+        <span class="logo-top">MÁFIA</span>
+        <span class="logo-bottom">Barbearia</span>
+      </span>
+    </a>
+
+    <nav class="main-nav" id="mainNav">
+      <div class="nav-links">
+        <a href="#inicio">Início</a>
+        <a href="#servicos">Serviços</a>
+        <a href="#equipe">Barbeiro</a>
+        <a href="#agendamento">Agendamento</a>
+        <a href="#contato">Contato</a>
       </div>
-      <div class="form-group full">
-        <label for="adminSenha">Senha</label>
-        <input type="password" id="adminSenha" required>
-      </div>
-      <button type="submit" class="btn-submit">Entrar</button>
-      <div class="form-msg" id="loginMsg"></div>
-    </form>
-  </div>
-</div>
-
-<div class="admin-painel" id="adminPainel" style="display:none;">
-  <header class="admin-header">
-    <span class="logo-top">MÁFIA <span class="admin-header-sub">/ Admin</span></span>
-    <div class="admin-header-actions">
-      <a href="index.html" class="btn-mini">Ver site</a>
-      <button id="btnLogout" class="btn btn-outline">Sair</button>
-    </div>
-  </header>
-
-  <main class="container admin-main">
-
-    <nav class="admin-tabs" id="adminTabs">
-      <button class="admin-tab admin-tab--ativo" data-tab="agendamentos">Agendamentos</button>
-      <button class="admin-tab" data-tab="servicos">Serviços</button>
-      <button class="admin-tab" data-tab="equipe">Equipe</button>
-      <button class="admin-tab" data-tab="galeria">Galeria</button>
-      <button class="admin-tab" data-tab="config">Configurações</button>
+      <a href="#agendamento" class="nav-cta">Agendar</a>
     </nav>
 
-    <!-- ===================== ABA: AGENDAMENTOS ===================== -->
-    <section class="admin-tab-painel admin-tab-painel--ativo" data-tab-painel="agendamentos">
+    <button class="menu-toggle" id="menuToggle" aria-label="Abrir menu">
+      <span></span><span></span><span></span>
+    </button>
+  </div>
+</header>
 
-      <div class="admin-stats" id="adminStats">
-        <div class="stat-card">
-          <span class="stat-num" id="statHoje">–</span>
-          <span class="stat-label">Hoje</span>
+<!-- ============ HERO ============ -->
+<section class="hero" id="inicio">
+  <div class="hero-watermark" id="heroWatermark">MÁFIA</div>
+
+  <svg class="hero-lines" id="heroLines" viewBox="0 0 1440 900" preserveAspectRatio="none">
+    <line x1="0" y1="120" x2="1440" y2="60" stroke="#C7C7C7" stroke-width="1" opacity="0.18"/>
+    <line x1="0" y1="820" x2="1440" y2="760" stroke="#C7C7C7" stroke-width="1" opacity="0.12"/>
+    <line x1="900" y1="0" x2="1150" y2="900" stroke="#C7C7C7" stroke-width="1" opacity="0.08"/>
+  </svg>
+
+  <div class="hero-grain"></div>
+
+  <div class="hero-inner">
+    <div class="hero-copy">
+      <span class="eyebrow">Estilo • Personalidade • Precisão</span>
+      <h1>Seu visual<br>fala <span>antes de você.</span></h1>
+      <p>Na Máfia Barbearia cada detalhe importa. Cortes modernos, acabamento preciso e uma experiência criada para quem valoriza presença e estilo.</p>
+      <div class="hero-btns">
+        <a href="#agendamento" class="btn btn-solid">Agendar horário</a>
+        <a href="#servicos" class="btn btn-outline">Conhecer serviços</a>
+      </div>
+    </div>
+
+    <div class="hero-visual" id="heroVisual">
+      <div class="hero-frame">
+        <svg viewBox="0 0 600 750" xmlns="http://www.w3.org/2000/svg">
+          <defs>
+            <radialGradient id="rg1" cx="65%" cy="30%" r="70%">
+              <stop offset="0%" stop-color="#1c1c1c"/>
+              <stop offset="100%" stop-color="#080808"/>
+            </radialGradient>
+            <linearGradient id="lg1" x1="0" y1="0" x2="1" y2="1">
+              <stop offset="0%" stop-color="#E4E4E4" stop-opacity="0.9"/>
+              <stop offset="100%" stop-color="#8A8A8A" stop-opacity="0.5"/>
+            </linearGradient>
+          </defs>
+          <rect width="600" height="750" fill="url(#rg1)"/>
+          <ellipse cx="150" cy="180" rx="140" ry="90" fill="#ffffff" opacity="0.025"/>
+          <ellipse cx="470" cy="600" rx="160" ry="110" fill="#ffffff" opacity="0.02"/>
+          <g stroke="url(#lg1)" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M330 640 C330 590 340 560 340 520 C340 470 320 440 320 400 C320 360 345 335 380 335 C415 335 438 362 438 400 C438 435 420 465 420 505 C420 555 430 590 428 640" />
+            <path d="M338 400 C338 375 355 360 380 360 C405 360 420 378 420 400" />
+            <path d="M120 700 C118 640 130 600 128 560 C126 500 150 460 150 460" />
+            <path d="M150 460 C130 430 128 395 150 365 C170 337 205 330 230 345" />
+            <path d="M150 460 C185 445 220 435 255 428" />
+            <path d="M255 428 L300 412" />
+            <path d="M300 412 L318 398 M300 412 L316 422" />
+            <circle cx="190" cy="380" r="26" />
+            <path d="M170 368 C178 358 202 356 212 366" />
+          </g>
+          <g stroke="#C7C7C7" stroke-width="1" opacity="0.35">
+            <line x1="40" y1="60" x2="90" y2="60"/>
+            <line x1="40" y1="60" x2="40" y2="110"/>
+            <line x1="560" y1="690" x2="510" y2="690"/>
+            <line x1="560" y1="690" x2="560" y2="640"/>
+          </g>
+        </svg>
+      </div>
+      <span class="corner tl"></span>
+      <span class="corner tr"></span>
+      <span class="corner bl"></span>
+      <span class="corner br"></span>
+    </div>
+  </div>
+
+  <div class="hero-scroll">
+    <span>Role para baixo</span>
+    <div class="scroll-line"></div>
+  </div>
+</section>
+
+<!-- ============ SERVIÇOS ============ -->
+<section id="servicos">
+  <div class="container">
+    <div class="section-head reveal">
+      <div>
+        <span class="eyebrow">O que oferecemos</span>
+        <h2>Nossos serviços</h2>
+      </div>
+      <p class="section-note">Técnica apurada, materiais de qualidade e um padrão de acabamento que não deixa nada ao acaso.</p>
+    </div>
+
+    <div class="servicos-grid reveal" id="servicosGrid">
+      <p class="plano-vazio">Carregando serviços...</p>
+    </div>
+  </div>
+</section>
+
+<!-- ============ BARBEIRO ============ -->
+<section id="equipe">
+  <div class="container">
+    <div class="section-head reveal">
+      <div>
+        <span class="eyebrow">Quem cuida de você</span>
+        <h2>O barbeiro da Máfia</h2>
+      </div>
+      <p class="section-note">Técnica, atenção e experiência em cada detalhe — em cada corte.</p>
+    </div>
+
+    <div class="equipe-grid reveal" id="equipeGrid">
+      <p class="plano-vazio">Carregando equipe...</p>
+    </div>
+  </div>
+</section>
+
+<!-- ============ DIFERENCIAL ============ -->
+<section id="diferencial">
+  <div class="container">
+    <div class="section-head reveal">
+      <div>
+        <span class="eyebrow">Nossos princípios</span>
+        <h2>O código da Máfia</h2>
+      </div>
+    </div>
+
+    <div class="diferencial-grid reveal">
+      <div class="diferencial-item">
+        <div class="diferencial-icon">
+          <svg viewBox="0 0 44 44" fill="none"><circle cx="22" cy="22" r="18" stroke="currentColor" stroke-width="1.4"/><circle cx="22" cy="22" r="10" stroke="currentColor" stroke-width="1.4"/><circle cx="22" cy="22" r="2" fill="currentColor"/><path d="M22 2V8M22 36V42M2 22H8M36 22H42" stroke="currentColor" stroke-width="1.4"/></svg>
         </div>
-        <div class="stat-card">
-          <span class="stat-num" id="statPendentes">–</span>
-          <span class="stat-label">Pendentes</span>
+        <h3>Precisão</h3>
+        <p>Detalhes fazem diferença.</p>
+      </div>
+      <div class="diferencial-item">
+        <div class="diferencial-icon">
+          <svg viewBox="0 0 44 44" fill="none"><circle cx="22" cy="22" r="18" stroke="currentColor" stroke-width="1.4"/><path d="M22 12V22L30 27" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/></svg>
         </div>
-        <div class="stat-card">
-          <span class="stat-num" id="statConfirmados">–</span>
-          <span class="stat-label">Confirmados</span>
+        <h3>Pontualidade</h3>
+        <p>Seu tempo é valorizado.</p>
+      </div>
+      <div class="diferencial-item">
+        <div class="diferencial-icon">
+          <svg viewBox="0 0 44 44" fill="none"><path d="M22 4L27 17L41 19L31 29L34 42L22 35L10 42L13 29L3 19L17 17L22 4Z" stroke="currentColor" stroke-width="1.4" stroke-linejoin="round"/></svg>
         </div>
-        <div class="stat-card">
-          <span class="stat-num" id="statMes">–</span>
-          <span class="stat-label">Este mês</span>
+        <h3>Estilo</h3>
+        <p>Cortes que combinam com sua identidade.</p>
+      </div>
+      <div class="diferencial-item">
+        <div class="diferencial-icon">
+          <svg viewBox="0 0 44 44" fill="none"><path d="M8 36C8 27 14 20 22 20C30 20 36 27 36 36" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/><circle cx="22" cy="12" r="8" stroke="currentColor" stroke-width="1.4"/></svg>
+        </div>
+        <h3>Experiência</h3>
+        <p>Mais do que atendimento.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ GALERIA ============ -->
+<section id="galeria">
+  <div class="container">
+    <div class="section-head reveal">
+      <div>
+        <span class="eyebrow">Registro</span>
+        <h2>Nossos trabalhos</h2>
+      </div>
+      <p class="section-note">Uma amostra do padrão que buscamos em cada cadeira.</p>
+    </div>
+
+    <div class="galeria-grid reveal" id="galeriaGrid">
+      <div class="g-item g-big galeria-tile">
+        <svg viewBox="0 0 400 300" preserveAspectRatio="xMidYMid slice"><rect width="400" height="300" fill="#141414"/><g stroke="#8A8A8A" stroke-width="1.5" opacity="0.7"><path d="M120 250C118 200 128 160 126 120C124 80 150 50 180 50C210 50 234 82 232 122C230 160 240 200 238 250"/><path d="M132 118C132 90 152 68 180 68C208 68 226 92 226 118"/></g><g stroke="#C7C7C7" stroke-width="1" opacity="0.3"><line x1="20" y1="20" x2="60" y2="20"/><line x1="20" y1="20" x2="20" y2="60"/><line x1="380" y1="280" x2="340" y2="280"/><line x1="380" y1="280" x2="380" y2="240"/></g></svg>
+        <div class="galeria-label"><span>Degradê navalhado</span></div>
+      </div>
+      <div class="g-item g-h1 galeria-tile">
+        <svg viewBox="0 0 400 150" preserveAspectRatio="xMidYMid slice"><rect width="400" height="150" fill="#191919"/><path d="M0 90 L400 60" stroke="#8A8A8A" stroke-width="1" opacity="0.4"/><path d="M0 110 L400 130" stroke="#8A8A8A" stroke-width="1" opacity="0.3"/><circle cx="330" cy="55" r="30" stroke="#C7C7C7" stroke-width="1.2" opacity="0.5" fill="none"/></svg>
+        <div class="galeria-label"><span>Acabamento navalha</span></div>
+      </div>
+      <div class="g-item g-h1 galeria-tile">
+        <svg viewBox="0 0 400 150" preserveAspectRatio="xMidYMid slice"><rect width="400" height="150" fill="#101010"/><g stroke="#8A8A8A" stroke-width="1.4" opacity="0.6"><path d="M40 40L110 110M110 40L40 110"/><path d="M290 30L360 30M290 60L360 60M290 90L360 90"/></g></svg>
+        <div class="galeria-label"><span>Barba alinhada</span></div>
+      </div>
+      <div class="g-item g-w2 galeria-tile">
+        <svg viewBox="0 0 400 150" preserveAspectRatio="xMidYMid slice"><rect width="400" height="150" fill="#161616"/><ellipse cx="200" cy="75" rx="180" ry="55" fill="#0c0c0c"/><g stroke="#C7C7C7" stroke-width="1" opacity="0.35"><line x1="60" y1="30" x2="340" y2="30"/><line x1="60" y1="120" x2="340" y2="120"/></g></svg>
+        <div class="galeria-label"><span>Ambiente Máfia</span></div>
+      </div>
+      <div class="g-item galeria-tile">
+        <svg viewBox="0 0 200 260" preserveAspectRatio="xMidYMid slice"><rect width="200" height="260" fill="#131313"/><path d="M40 220C38 180 46 150 44 120C42 90 60 65 100 65C140 65 158 92 156 122C154 150 162 180 160 220" stroke="#8A8A8A" stroke-width="1.5" fill="none" opacity="0.65"/></svg>
+        <div class="galeria-label"><span>Corte clássico</span></div>
+      </div>
+      <div class="g-item galeria-tile">
+        <svg viewBox="0 0 200 260" preserveAspectRatio="xMidYMid slice"><rect width="200" height="260" fill="#0d0d0d"/><g stroke="#C7C7C7" stroke-width="1" opacity="0.4"><line x1="30" y1="60" x2="170" y2="30"/><line x1="30" y1="130" x2="170" y2="110"/><line x1="30" y1="200" x2="170" y2="190"/></g></svg>
+        <div class="galeria-label"><span>Textura e risco</span></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ HORÁRIOS ============ -->
+<section id="horarios">
+  <div class="container">
+    <div class="section-head reveal">
+      <div>
+        <span class="eyebrow">Quando estamos abertos</span>
+        <h2>Horários</h2>
+      </div>
+    </div>
+
+    <div class="horarios-wrap reveal">
+      <div class="horarios-grid" id="horariosGrid">
+        <div class="horario-row">
+          <span class="horario-dia">Segunda — Sexta</span>
+          <span class="horario-horas" id="hSegSex">—</span>
+        </div>
+        <div class="horario-row">
+          <span class="horario-dia">Sábado</span>
+          <span class="horario-horas" id="hSabado">—</span>
+        </div>
+        <div class="horario-row fechado" id="hDomingoRow">
+          <span class="horario-dia">Domingo</span>
+          <span class="horario-horas" id="hDomingo">Fechado</span>
         </div>
       </div>
 
-      <div class="admin-toolbar">
-        <h2>Agendamentos</h2>
-        <div class="admin-filtros">
-          <input type="text" id="buscaTexto" placeholder="Buscar por nome, telefone ou e-mail">
-          <select id="filtroBarbeiro">
-            <option value="todos">Todos os barbeiros</option>
-          </select>
-          <select id="filtroStatus">
-            <option value="todos">Todos os status</option>
-            <option value="pendente">Pendente</option>
-            <option value="confirmado">Confirmado</option>
-            <option value="concluido">Concluído</option>
-            <option value="cancelado">Cancelado</option>
-          </select>
-          <input type="date" id="filtroData">
-          <button id="btnHoje" class="btn btn-outline">Hoje</button>
-          <button id="btnAtualizar" class="btn btn-outline">Atualizar</button>
-        </div>
+      <div class="horarios-side">
+        <svg viewBox="0 0 400 400">
+          <rect width="400" height="400" fill="#0c0c0c"/>
+          <circle cx="200" cy="200" r="140" stroke="#8A8A8A" stroke-width="1" fill="none" opacity="0.5"/>
+          <circle cx="200" cy="200" r="2.5" fill="#E4E4E4"/>
+          <line x1="200" y1="200" x2="200" y2="90" stroke="#E4E4E4" stroke-width="2" stroke-linecap="round"/>
+          <line x1="200" y1="200" x2="270" y2="230" stroke="#8A8A8A" stroke-width="2" stroke-linecap="round"/>
+          <g stroke="#C7C7C7" stroke-width="1" opacity="0.4">
+            <line x1="200" y1="60" x2="200" y2="80"/>
+            <line x1="200" y1="320" x2="200" y2="340"/>
+            <line x1="60" y1="200" x2="80" y2="200"/>
+            <line x1="320" y1="200" x2="340" y2="200"/>
+          </g>
+        </svg>
       </div>
+    </div>
+  </div>
+</section>
 
-      <div id="adminLista" class="admin-lista">
-        <p class="plano-vazio">Carregando agendamentos...</p>
+<!-- ============ AGENDAMENTO ============ -->
+<section id="agendamento">
+  <div class="container">
+    <div class="section-head reveal">
+      <div>
+        <span class="eyebrow">Reservar horário</span>
+        <h2>Agendamento</h2>
       </div>
-    </section>
+      <p class="section-note">Preencha os dados abaixo. Confirmamos seu horário o quanto antes.</p>
+    </div>
 
-    <!-- ===================== ABA: SERVIÇOS ===================== -->
-    <section class="admin-tab-painel" data-tab-painel="servicos">
-      <div class="admin-toolbar">
-        <h2>Serviços</h2>
-        <button id="btnNovoServico" class="btn btn-outline">+ Novo serviço</button>
-      </div>
-      <p class="admin-dica">Preço, duração e status ficam ativos assim que você salva — o site público atualiza sozinho.</p>
-      <div id="listaServicos" class="admin-crud-lista">
-        <p class="plano-vazio">Carregando serviços...</p>
-      </div>
-    </section>
+    <div class="agendamento-wrap reveal">
+      <div class="form-card">
 
-    <!-- ===================== ABA: EQUIPE ===================== -->
-    <section class="admin-tab-painel" data-tab-painel="equipe">
-      <div class="admin-toolbar">
-        <h2>Equipe</h2>
-        <button id="btnNovoBarbeiro" class="btn btn-outline">+ Novo barbeiro</button>
-      </div>
-      <p class="admin-dica">Cada barbeiro tem horário de trabalho e folgas próprios — configure abrindo o cartão dele.</p>
-      <div id="listaBarbeiros" class="admin-crud-lista">
-        <p class="plano-vazio">Carregando equipe...</p>
-      </div>
-    </section>
-
-    <!-- ===================== ABA: GALERIA ===================== -->
-    <section class="admin-tab-painel" data-tab-painel="galeria">
-      <div class="admin-toolbar">
-        <h2>Galeria de trabalhos</h2>
-        <label class="btn btn-outline" style="cursor:pointer;">
-          + Nova foto
-          <input type="file" id="inputNovaFoto" accept="image/*" style="display:none;">
-        </label>
-      </div>
-      <p class="admin-dica">Fotos reais aparecem no lugar das ilustrações da seção "Nossos trabalhos" do site.</p>
-      <div id="listaGaleria" class="admin-crud-lista admin-crud-lista--grid">
-        <p class="plano-vazio">Carregando galeria...</p>
-      </div>
-    </section>
-
-    <!-- ===================== ABA: CONFIGURAÇÕES ===================== -->
-    <section class="admin-tab-painel" data-tab-painel="config">
-      <div class="admin-toolbar">
-        <h2>Configurações da barbearia</h2>
-      </div>
-      <form id="formConfig" class="admin-config-form">
-        <div class="form-grid">
-          <div class="form-group">
-            <label for="cfgNome">Nome da barbearia</label>
-            <input type="text" id="cfgNome">
+        <!-- ---- VOCÊ TEM PLANO / JÁ AGENDOU ---- -->
+        <div class="plano-box">
+          <h3>💎 Você já agendou?</h3>
+          <p>Digite seu e-mail para ver seus horários já marcados.</p>
+          <div class="plano-search">
+            <input type="email" id="planoEmail" placeholder="seu@email.com">
+            <button type="button" id="planoBuscar" class="btn-mini-solid">Buscar</button>
           </div>
-          <div class="form-group">
-            <label for="cfgTagline">Frase de efeito (aparece no topo do site)</label>
-            <input type="text" id="cfgTagline">
-          </div>
-          <div class="form-group">
-            <label for="cfgEndereco">Endereço</label>
-            <input type="text" id="cfgEndereco">
-          </div>
-          <div class="form-group">
-            <label for="cfgTelefone">Telefone (exibido no site)</label>
-            <input type="text" id="cfgTelefone" placeholder="(37) 99999-9999">
-          </div>
-          <div class="form-group">
-            <label for="cfgWhatsapp">WhatsApp (só números, com DDD e país)</label>
-            <input type="text" id="cfgWhatsapp" placeholder="5537999999999">
-          </div>
-          <div class="form-group">
-            <label for="cfgInstagram">Instagram</label>
-            <input type="text" id="cfgInstagram" placeholder="@mafiabarbearia">
-          </div>
-          <div class="form-group">
-            <label for="cfgEmail">E-mail de contato</label>
-            <input type="email" id="cfgEmail">
-          </div>
-          <div class="form-group">
-            <label for="cfgIntervalo">Duração padrão de cada horário (minutos)</label>
-            <input type="number" id="cfgIntervalo" min="10" step="5">
-          </div>
-        </div>
-
-        <h3 class="admin-subtitulo">Horário geral (exibido no site)</h3>
-        <div class="form-grid">
-          <div class="form-group">
-            <label for="cfgSegSexAbre">Segunda a sexta — abre</label>
-            <input type="time" id="cfgSegSexAbre">
-          </div>
-          <div class="form-group">
-            <label for="cfgSegSexFecha">Segunda a sexta — fecha</label>
-            <input type="time" id="cfgSegSexFecha">
-          </div>
-          <div class="form-group">
-            <label for="cfgSabadoAbre">Sábado — abre</label>
-            <input type="time" id="cfgSabadoAbre">
-          </div>
-          <div class="form-group">
-            <label for="cfgSabadoFecha">Sábado — fecha</label>
-            <input type="time" id="cfgSabadoFecha">
-          </div>
-          <div class="form-group form-group--check">
-            <label><input type="checkbox" id="cfgDomingo"> Funciona aos domingos</label>
-          </div>
+          <div id="planoResultados" class="plano-resultados"></div>
         </div>
 
-        <button type="submit" class="btn-submit" style="max-width:220px;">Salvar configurações</button>
-        <p class="admin-msg" id="configMsg"></p>
-      </form>
-    </section>
+        <div class="divisor-form"><span>Novo agendamento</span></div>
 
-  </main>
-</div>
+        <form id="formAgendamento">
+          <!-- Campo armadilha contra spam: invisível pra gente, mas bots
+               costumam preencher tudo que encontram. Se vier preenchido,
+               a gente sabe que não é uma pessoa de verdade. -->
+          <div style="position:absolute;left:-9999px;" aria-hidden="true">
+            <label for="siteWeb">Não preencha este campo</label>
+            <input type="text" id="siteWeb" name="siteWeb" tabindex="-1" autocomplete="off">
+          </div>
 
-<script type="module" src="admin.js"></script>
+          <div class="form-grid">
+            <div class="form-group full">
+              <label for="nome">Nome</label>
+              <input type="text" id="nome" placeholder="Seu nome completo" required>
+            </div>
+            <div class="form-group">
+              <label for="telefone">Telefone</label>
+              <input type="tel" id="telefone" placeholder="(37) 90000-0000" required>
+            </div>
+            <div class="form-group">
+              <label for="email">E-mail</label>
+              <input type="email" id="email" placeholder="seu@email.com" required>
+            </div>
+            <div class="form-group full">
+              <label for="barbeiroSelect">Barbeiro</label>
+              <select id="barbeiroSelect" required>
+                <option value="">Carregando...</option>
+              </select>
+            </div>
+            <div class="form-group full">
+              <label for="servico">Serviço</label>
+              <select id="servico" required>
+                <option value="">Carregando...</option>
+              </select>
+            </div>
+          </div>
+
+          <!-- ---- CALENDÁRIO ---- -->
+          <div class="calendario">
+            <div class="calendario-head">
+              <button type="button" id="calPrev" aria-label="Mês anterior">‹</button>
+              <span id="calMonthLabel">—</span>
+              <button type="button" id="calNext" aria-label="Próximo mês">›</button>
+            </div>
+            <div class="calendario-dias-semana">
+              <span>Dom</span><span>Seg</span><span>Ter</span><span>Qua</span><span>Qui</span><span>Sex</span><span>Sáb</span>
+            </div>
+            <div class="calendario-grid" id="calGrid"></div>
+          </div>
+
+          <!-- ---- TURNO ---- -->
+          <div class="form-group full">
+            <label>Horário</label>
+            <div class="turno-select" id="turnoSelect">
+              <span class="horario-aviso">Escolha uma data no calendário para ver os horários disponíveis.</span>
+            </div>
+          </div>
+
+          <button type="submit" class="btn-submit" id="btnAgendar">Confirmar agendamento</button>
+          <div class="form-msg" id="formMsg"></div>
+        </form>
+      </div>
+
+      <div class="agendamento-side">
+        <h3>Antes de vir</h3>
+        <div class="side-item">
+          <span class="side-ico"><svg viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="9" stroke="currentColor" stroke-width="1.4"/><path d="M12 7V12L15.5 14" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/></svg></span>
+          <div><strong>Chegue com antecedência</strong><span>Recomendamos 10 minutos antes do horário marcado.</span></div>
+        </div>
+        <div class="side-item">
+          <span class="side-ico"><svg viewBox="0 0 24 24" fill="none"><path d="M4 12H20M4 12L10 6M4 12L10 18" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
+          <div><strong>Cancelamentos</strong><span>Avise com pelo menos 2 horas de antecedência pelo WhatsApp.</span></div>
+        </div>
+        <div class="side-item">
+          <span class="side-ico"><svg viewBox="0 0 24 24" fill="none"><rect x="3" y="6" width="18" height="13" rx="1.5" stroke="currentColor" stroke-width="1.4"/><path d="M3 10H21" stroke="currentColor" stroke-width="1.4"/></svg></span>
+          <div><strong>Pagamento</strong><span>Aceitamos Pix, dinheiro, débito e crédito.</span></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ CONTATO ============ -->
+<section id="contato">
+  <div class="container">
+    <div class="section-head reveal">
+      <div>
+        <span class="eyebrow">Fale conosco</span>
+        <h2>Contato</h2>
+      </div>
+    </div>
+
+    <div class="contato-wrap reveal">
+      <div class="contato-info">
+        <div class="contato-item">
+          <span class="contato-label">Endereço</span>
+          <span id="ctEndereco">Carregando...</span>
+        </div>
+        <div class="contato-item">
+          <span class="contato-label">Telefone</span>
+          <a id="ctTelefoneLink" href="#">Carregando...</a>
+        </div>
+        <div class="contato-item">
+          <span class="contato-label">Instagram</span>
+          <a id="ctInstagramLink" href="#" target="_blank" rel="noopener">Carregando...</a>
+        </div>
+        <div class="contato-btns">
+          <a id="ctWhatsBtn" href="#" target="_blank" rel="noopener" class="btn-whats">Chamar no WhatsApp</a>
+          <a id="ctMapaLink" href="#" target="_blank" rel="noopener" class="btn btn-outline">Ver localização</a>
+        </div>
+      </div>
+
+      <div class="mapa-frame">
+        <iframe
+          id="ctMapaFrame"
+          src=""
+          loading="lazy"
+          referrerpolicy="no-referrer-when-downgrade"
+          title="Localização Máfia Barbearia">
+        </iframe>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ FOOTER ============ -->
+<footer>
+  <div class="container">
+    <div class="footer-top">
+      <div class="footer-brand">
+        <span class="logo-top">MÁFIA</span>
+        <p class="footer-tag" id="ftTagline">Máfia Barbearia — estilo, atitude e precisão.</p>
+      </div>
+
+      <div class="footer-cols">
+        <div class="footer-col">
+          <h4>Navegar</h4>
+          <a href="#servicos">Serviços</a>
+          <a href="#equipe">Barbeiro</a>
+          <a href="#agendamento">Agendamento</a>
+          <a href="#contato">Contato</a>
+        </div>
+        <div class="footer-col">
+          <h4>Contato</h4>
+          <span id="ftTelefone">—</span>
+          <span id="ftEndereco">—</span>
+          <a id="ftInstagram" href="#" target="_blank" rel="noopener">—</a>
+        </div>
+        <div class="footer-col">
+          <h4>Horário</h4>
+          <span id="ftSegSex">—</span>
+          <span id="ftSabado">—</span>
+          <span id="ftDomingo">Domingo · Fechado</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="footer-bottom">
+      <span>© 2026 <span id="ftNome">Máfia Barbearia</span> — Todos os direitos reservados.</span>
+      <span id="ftCidade">Lagoa da Prata, MG</span> · <a href="admin.html" style="color:inherit;">Acesso administrativo</a>
+    </div>
+  </div>
+</footer>
+
+<script src="scripts.js"></script>
+<script src="menu-mobile.js"></script>
+<script type="module" src="conteudo.js"></script>
+<script type="module" src="agendamento.js"></script>
 </body>
 </html>
