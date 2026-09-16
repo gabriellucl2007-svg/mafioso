@@ -171,6 +171,13 @@ if (form) {
   form.addEventListener("submit", async (e) => {
     e.preventDefault();
 
+    // Se o campo armadilha veio preenchido, é bot. Finge sucesso e não faz nada.
+    const campoArmadilha = document.getElementById("siteWeb");
+    if (campoArmadilha && campoArmadilha.value.trim() !== "") {
+      form.reset();
+      return;
+    }
+
     const nome = document.getElementById("nome").value.trim();
     const telefone = document.getElementById("telefone").value.trim();
     const email = document.getElementById("email").value.trim().toLowerCase();
