@@ -1,0 +1,19 @@
+name: Manter banco de dados ativo
+
+# Roda sozinho a cada 3 dias, e também pode ser rodado manualmente
+# na aba "Actions" do GitHub (botão "Run workflow").
+on:
+  schedule:
+    - cron: '0 12 */3 * *'
+  workflow_dispatch:
+
+jobs:
+  ping-supabase:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Fazer uma consulta simples pro banco (evita ele pausar por inatividade)
+        run: |
+          curl -s -o /dev/null -w "Status: %{http_code}\n" \
+            "https://wxvaekrrxfafxlirigya.supabase.co/rest/v1/servicos?select=id&limit=1" \
+            -H "apikey: ${{ secrets.SUPABASE_ANON_KEY }}" \
+            -H "Authorization: Bearer ${{ secrets.SUPABASE_ANON_KEY }}"
