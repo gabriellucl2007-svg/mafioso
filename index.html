@@ -314,6 +314,14 @@
         <div class="divisor-form"><span>Novo agendamento</span></div>
 
         <form id="formAgendamento">
+          <!-- Campo armadilha contra spam: invisível pra gente, mas bots
+               costumam preencher tudo que encontram. Se vier preenchido,
+               a gente sabe que não é uma pessoa de verdade. -->
+          <div style="position:absolute;left:-9999px;" aria-hidden="true">
+            <label for="siteWeb">Não preencha este campo</label>
+            <input type="text" id="siteWeb" name="siteWeb" tabindex="-1" autocomplete="off">
+          </div>
+
           <div class="form-grid">
             <div class="form-group full">
               <label for="nome">Nome</label>
