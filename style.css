@@ -427,28 +427,6 @@ header{
   color:var(--gray-300);
 }
 
-/* ============ DEPOIMENTOS ============ */
-.depoimentos-grid{
-  display:grid;
-  grid-template-columns:repeat(auto-fit,minmax(280px,1fr));
-  gap:1px;
-  background:var(--line-soft);
-  border:1px solid var(--line-soft);
-}
-.depoimento-card{
-  background:var(--bg-2);
-  padding:30px 28px;
-}
-.depoimento-estrelas{color:#d8c07a;font-size:15px;letter-spacing:2px;margin-bottom:14px;}
-.depoimento-texto{color:var(--gray-300);font-size:14.5px;line-height:1.7;margin-bottom:18px;}
-.depoimento-nome{
-  font-family:'Oswald',sans-serif;
-  font-size:13px;
-  letter-spacing:.04em;
-  text-transform:uppercase;
-  color:var(--gray-600);
-}
-
 /* ============ HORÁRIOS ============ */
 .horarios-wrap{
   display:grid;
@@ -1331,10 +1309,47 @@ footer{
 }
 .galeria-card-acoes{display:flex;justify-content:space-between;align-items:center;gap:8px;}
 
-.depoimento-card .crud-form{grid-template-columns:1fr 120px;}
-.estrelas-input{display:flex;gap:4px;font-size:20px;}
-.estrelas-input span{cursor:pointer;color:var(--line-soft);}
-.estrelas-input span.ativa{color:#d8c07a;}
+
+
+/* ========================================================
+   RELATÓRIOS
+   ======================================================== */
+.rel-colunas{
+  display:grid;
+  grid-template-columns:repeat(3,1fr);
+  gap:18px;
+  margin-top:8px;
+}
+.rel-bloco{
+  background:var(--bg-2);
+  border:1px solid var(--line-soft);
+  border-radius:var(--radius);
+  padding:22px 22px 18px;
+}
+.rel-bloco h3{
+  font-family:'Oswald',sans-serif;
+  font-size:13px;
+  letter-spacing:.06em;
+  text-transform:uppercase;
+  color:var(--gray-500);
+  margin-bottom:18px;
+}
+.rel-linha{margin-bottom:16px;}
+.rel-linha-topo{
+  display:flex;
+  justify-content:space-between;
+  gap:12px;
+  font-size:13.5px;
+  color:var(--gray-300);
+  margin-bottom:6px;
+}
+.rel-linha-topo strong{color:var(--gray-100);font-family:'Bebas Neue',sans-serif;font-size:18px;letter-spacing:.03em;}
+.rel-barra{height:4px;background:var(--line-soft);border-radius:2px;overflow:hidden;}
+.rel-barra-preenchida{height:100%;background:var(--gray-300);border-radius:2px;}
+
+@media (max-width:900px){
+  .rel-colunas{grid-template-columns:1fr;}
+}
 
 @media (max-width:900px){
   .admin-stats{grid-template-columns:repeat(2,1fr);}

@@ -52,8 +52,17 @@ let agendamentosCache = [];
 let barbeirosCache = [];
 let servicosCache = [];
 
+// Data de hoje no fuso LOCAL do navegador (não em UTC — em UTC, depois das
+// 21h no Brasil o sistema achava que já era o dia seguinte).
+function dataLocalISO(d) {
+  const ano = d.getFullYear();
+  const mes = String(d.getMonth() + 1).padStart(2, "0");
+  const dia = String(d.getDate()).padStart(2, "0");
+  return `${ano}-${mes}-${dia}`;
+}
+
 function hojeISO() {
-  return new Date().toISOString().slice(0, 10);
+  return dataLocalISO(new Date());
 }
 
 function formatarDataBR(iso) {
@@ -66,7 +75,7 @@ function nomeDia(iso) {
   if (iso === hoje) return "Hoje";
   const amanha = new Date();
   amanha.setDate(amanha.getDate() + 1);
-  if (iso === amanha.toISOString().slice(0, 10)) return "Amanhã";
+  if (iso === dataLocalISO(amanha)) return "Amanhã";
   return formatarDataBR(iso);
 }
 
@@ -134,6 +143,7 @@ async function carregarTudo() {
   await Promise.all([carregarServicos(), carregarBarbeiros(), carregarGaleria()]);
   await carregarAgendamentos();
   await carregarConfig();
+  renderRelatorios();
 }
 
 /* ===================================================================
@@ -146,6 +156,7 @@ abas.forEach(btn => {
     btn.classList.add("admin-tab--ativo");
     const alvo = btn.dataset.tab;
     paineisAbas.forEach(p => p.classList.toggle("admin-tab-painel--ativo", p.dataset.tabPainel === alvo));
+    if (alvo === "relatorios") renderRelatorios();
   });
 });
 
@@ -274,6 +285,7 @@ async function carregarAgendamentos() {
   agendamentosCache = agendamentos || [];
   atualizarResumo(agendamentosCache);
   renderLista(aplicarFiltrosLocais(agendamentosCache));
+  renderRelatorios();
 }
 
 filtroStatus.addEventListener("change", () => renderLista(aplicarFiltrosLocais(agendamentosCache)));
@@ -285,6 +297,80 @@ btnHoje.addEventListener("click", () => {
   filtroData.value = hojeISO();
   renderLista(aplicarFiltrosLocais(agendamentosCache));
 });
+
+/* ===================================================================
+   RELATÓRIOS
+   =================================================================== */
+
+function formatarReais(valor) {
+  return Number(valor || 0).toLocaleString("pt-BR", { style: "currency", currency: "BRL" });
+}
+
+// Descobre o preço de um agendamento: primeiro pelo serviço ligado (servico_id),
+// e se ele tiver sido apagado, tenta pelo nome. Se não achar, conta como 0.
+function precoDoAgendamento(a) {
+  const porId = servicosCache.find(s => s.id === a.servico_id);
+  if (porId) return Number(porId.preco) || 0;
+  const porNome = servicosCache.find(s => s.nome === a.servico);
+  return porNome ? Number(porNome.preco) || 0 : 0;
+}
+
+function contarPor(lista, chaveFn) {
+  const contagem = {};
+  lista.forEach(item => {
+    const chave = chaveFn(item);
+    if (!chave) return;
+    contagem[chave] = (contagem[chave] || 0) + 1;
+  });
+  return Object.entries(contagem).sort((a, b) => b[1] - a[1]);
+}
+
+function renderRanking(elementoId, pares, limite = 5) {
+  const el = document.getElementById(elementoId);
+  if (!el) return;
+
+  if (!pares.length) {
+    el.innerHTML = `<p class="plano-vazio" style="padding:24px;">Sem dados ainda neste mês.</p>`;
+    return;
+  }
+
+  const topo = pares.slice(0, limite);
+  const maior = topo[0][1];
+
+  el.innerHTML = topo.map(([nome, qtd]) => `
+    <div class="rel-linha">
+      <div class="rel-linha-topo">
+        <span>${escapeHTML(nome)}</span>
+        <strong>${qtd}</strong>
+      </div>
+      <div class="rel-barra"><div class="rel-barra-preenchida" style="width:${Math.round((qtd / maior) * 100)}%"></div></div>
+    </div>
+  `).join("");
+}
+
+function renderRelatorios() {
+  if (!document.getElementById("relFaturamento")) return;
+
+  const mesAtual = hojeISO().slice(0, 7);
+  const doMes = agendamentosCache.filter(a => (a.data || "").slice(0, 7) === mesAtual);
+
+  const cancelados = doMes.filter(a => a.status === "cancelado");
+  const naoCancelados = doMes.filter(a => a.status !== "cancelado");
+  const faturaveis = doMes.filter(a => a.status === "confirmado" || a.status === "concluido");
+
+  const faturamento = faturaveis.reduce((soma, a) => soma + precoDoAgendamento(a), 0);
+  const ticketMedio = faturaveis.length ? faturamento / faturaveis.length : 0;
+  const taxaCancel = doMes.length ? Math.round((cancelados.length / doMes.length) * 100) : 0;
+
+  document.getElementById("relFaturamento").textContent = formatarReais(faturamento);
+  document.getElementById("relTotalMes").textContent = naoCancelados.length;
+  document.getElementById("relTicketMedio").textContent = formatarReais(ticketMedio);
+  document.getElementById("relCancelamento").textContent = `${taxaCancel}%`;
+
+  renderRanking("relServicos", contarPor(naoCancelados, a => a.servico));
+  renderRanking("relBarbeiros", contarPor(naoCancelados, a => a.barbeiro));
+  renderRanking("relHorarios", contarPor(naoCancelados, a => a.hora ? `${a.hora.slice(0, 2)}h` : null));
+}
 
 /* ===================================================================
    SERVIÇOS
@@ -788,5 +874,4 @@ formConfig.addEventListener("submit", async (e) => {
   configMsg.classList.add("success");
 });
 
-verificarSessao();
 verificarSessao();
