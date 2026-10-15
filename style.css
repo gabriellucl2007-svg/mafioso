@@ -1362,3 +1362,35 @@ footer{
   .admin-header{padding:16px 20px;}
   .admin-main{padding:36px 20px;}
 }
+
+/* ============ LOGO (imagem oficial) ============ */
+.logo--stack{flex-direction:column;gap:5px;}
+.logo-img{height:42px;width:auto;display:block;}
+.logo--stack .logo-bottom{padding-left:0.3em;}  /* compensa o espaçamento da última letra, pra centralizar */
+
+.hero-frame{
+  display:flex;align-items:center;justify-content:center;
+  background:radial-gradient(circle at 65% 30%,#1c1c1c 0%,#080808 100%);
+}
+.hero-logo{
+  width:74%;height:auto;display:block;
+  filter:drop-shadow(0 0 34px rgba(255,255,255,.07));
+}
+
+.footer-logo{width:104px;height:auto;display:block;}
+.admin-logo-img{display:block;width:150px;height:auto;margin:0 auto 14px;}
+
+@media (max-width:600px){
+  .logo-img{height:38px;}
+  .hero-logo{width:70%;}
+}
+
+.admin-msg{font-size:13px;color:var(--gray-500);min-height:18px;}
+.admin-msg.success{color:#a8c99a;}
+
+/* A ADM usa <header> mas NÃO pode ficar fixo por cima do conteúdo
+   (a regra global "header" é fixa e escondia as abas/primeiras opções). */
+.admin-header{position:sticky;top:0;left:auto;right:auto;}
+.admin-main{padding-top:36px;}
+/* As abas da ADM são <section>, mas não podem herdar o espaçamento/fundo das seções da home */
+.admin-main .admin-tab-painel{padding:0;background:transparent;}

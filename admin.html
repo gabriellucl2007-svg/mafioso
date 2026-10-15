@@ -5,31 +5,33 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Painel Administrativo | Máfia Barbearia</title>
 <meta name="robots" content="noindex, nofollow">
-<link rel="icon" type="image/svg+xml" href="favicon.svg">
+<link rel="icon" type="image/png" sizes="64x64" href="favicon.png">
+<link rel="apple-touch-icon" href="apple-touch-icon.png">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Oswald:wght@500;600;700&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="style.css">
 </head>
-<body>
+<body class="admin-body">
 
 <!-- ===================== TELA DE LOGIN ===================== -->
-<div class="admin-page" id="adminLogin">
-  <div class="admin-card">
-    <span class="logo">MÁFIA</span>
-    <p class="sub">Painel administrativo — acesso restrito</p>
+<div class="admin-login" id="adminLogin">
+  <div class="admin-login-card">
+    <img class="admin-logo-img" src="logo-mafia.png" alt="Máfia Barbearia" width="150" height="160">
+    <h1 class="admin-title">Painel administrativo</h1>
+    <p class="admin-sub">Acesso restrito. Entre com seu usuário e senha de administrador.</p>
 
     <form id="formLogin">
-      <div class="field">
+      <div class="form-group">
         <label for="adminEmail">Usuário</label>
-        <input type="text" id="adminEmail" required>
+        <input type="text" id="adminEmail" autocomplete="username" required>
       </div>
-      <div class="field">
+      <div class="form-group">
         <label for="adminSenha">Senha</label>
-        <input type="password" id="adminSenha" required>
+        <input type="password" id="adminSenha" autocomplete="current-password" required>
       </div>
       <button type="submit" class="btn-submit">Entrar</button>
-      <p class="admin-msg" id="loginMsg"></p>
+      <p class="form-msg" id="loginMsg"></p>
     </form>
   </div>
 </div>
