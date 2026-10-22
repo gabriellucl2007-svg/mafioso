@@ -1,5 +1,8 @@
 name: Manter banco de dados ativo
 
+# Roda sozinho a cada 3 dias (e dá pra rodar na mão: aba Actions > Run workflow).
+# Faz uma leitura simples no banco pra ele não pausar por inatividade.
+# Se o banco NÃO responder 200, o job fica VERMELHO (aí você sabe que algo está errado).
 on:
   schedule:
     - cron: '0 12 */3 * *'
@@ -9,9 +12,15 @@ jobs:
   ping-supabase:
     runs-on: ubuntu-latest
     steps:
-      - name: Ping no banco pra evitar pausa por inatividade
+      - name: Ping no banco
         run: |
-          curl -s -o /dev/null -w "Status: %{http_code}\n" \
+          # chave "anon" é PÚBLICA (a mesma do supabase-config.js) — não é segredo
+          KEY="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Ind4dmFla3JyeGZhZnhsaXJpZ3lhIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODMwOTI0MzIsImV4cCI6MjA5ODY2ODQzMn0.uhTZ71SqFwJJ9pOrZ5su8o1JzcGiNpS6iCFEWvQWJHE"
+          status=$(curl -s -o /dev/null -w "%{http_code}" \
             "https://wxvaekrrxfafxlirigya.supabase.co/rest/v1/servicos?select=id&limit=1" \
-            -H "apikey: ${{ secrets.SUPABASE_ANON_KEY }}" \
-            -H "Authorization: Bearer ${{ secrets.SUPABASE_ANON_KEY }}"
+            -H "apikey: $KEY" -H "Authorization: Bearer $KEY")
+          echo "Resposta do banco: $status"
+          if [ "$status" != "200" ]; then
+            echo "ERRO: o banco não respondeu 200"
+            exit 1
+          fi
